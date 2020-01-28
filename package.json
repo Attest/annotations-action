@@ -46,7 +46,10 @@
     }
   },
   "dependencies": {
-    "@octokit/core": "^2.2.0"
+    "@actions/core": "^1.2.2",
+    "@actions/github": "^2.1.0",
+    "@octokit/core": "^2.2.0",
+    "@octokit/rest": "^16.39.0"
   },
   "devDependencies": {
     "@attest/config-babel-preset-env-node": "^0.1.17",

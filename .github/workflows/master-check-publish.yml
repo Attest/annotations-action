@@ -6,14 +6,8 @@ on:
       - master
 
 jobs:
-  healthCheck:
-    strategy:
-      matrix:
-        command:
-          - typecheck
-          - lint
-          - format
-    name: ${{ matrix.command }}
+  healthcheck:
+    name: 'healthcheck'
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
@@ -39,9 +33,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ADMIN_GH_TOKEN }}
       - name: 'Install dependencies'
         run: yarn install --frozen-lockfile
-      - run: yarn ${{ matrix.command }}
+      - name: 'Typecheck'
+        run: yarn typecheck
+      - name: 'Lint'
+        run: yarn lint
+      - name: 'Format'
+        run: yarn format
   publish:
-    needs: [healthCheck]
+    needs: [healthcheck]
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1

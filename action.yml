@@ -1,0 +1,15 @@
+name: 'Annotations Action'
+description: 'Dynamically label pull requests affecting packages in a monorepo / workspace'
+author: 'Attest Engineering <dev@askattest.com> (https://askattest.com)'
+icon: 'edit-3'
+color: 'blue'
+inputs:
+  secret:
+    description: 'The GITHUB_TOKEN secret'
+  path:
+    description: 'The JSON file to consume'
+  title:
+    description: 'The actions title'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

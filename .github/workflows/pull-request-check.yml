@@ -2,15 +2,8 @@ name: Pull Request Check
 on: [pull_request]
 
 jobs:
-  prCheck:
-    strategy:
-      matrix:
-        command:
-          - typecheck
-          - lint
-          - format
-          - build
-    name: ${{ matrix.command }}
+  healthcheck:
+    name: 'healthcheck'
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
@@ -36,4 +29,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ADMIN_GH_TOKEN }}
       - name: 'Install dependencies'
         run: yarn install --frozen-lockfile
-      - run: yarn ${{ matrix.command }}
+      - name: 'Typecheck'
+        run: yarn typecheck
+      - name: 'Lint'
+        run: yarn lint
+      - name: 'Format'
+        run: yarn format
+      - name: 'Build'
+        run: yarn build
+      - name: 'Install dependencies (production)'
+        run: yarn install --frozen-lockfile --production
+      - name: 'Test'
+        uses: ./
+        with:
+          path: ./annotations.json
+          title: Annotation Test
+          token: ${{ secrets.GITHUB_TOKEN }}
