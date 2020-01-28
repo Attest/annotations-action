@@ -1,0 +1,39 @@
+name: Pull Request Check
+on: [pull_request]
+
+jobs:
+  prCheck:
+    strategy:
+      matrix:
+        command:
+          - typecheck
+          - lint
+          - format
+          - build
+    name: ${{ matrix.command }}
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: 'Cache yarn'
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: 'Cache node_modules'
+        uses: actions/cache@v1
+        with:
+          path: ${{ github.workspace }}/node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+      - name: 'Setup registry'
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
+          echo "@attest:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+        env:
+          GITHUB_TOKEN: ${{ secrets.ADMIN_GH_TOKEN }}
+      - name: 'Install dependencies'
+        run: yarn install --frozen-lockfile
+      - run: yarn ${{ matrix.command }}
