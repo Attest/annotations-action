@@ -1,0 +1,6 @@
+{
+  "extends": "@attest/config-typescript",
+  "compilerOptions": {
+    "baseUrl": "."
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "name": "annotations-action",
+  "version": "0.0.0",
+  "private": true,
+  "description": "GitHub action for creating annotations from JSON file",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "-----------------UTILITY---------------": ".",
+    "commit": "git-cz",
+    "clean:nodemodules": "rimraf node_modules, yarn.lock",
+    "clean:dist": "rimraf dist",
+    "clean:jest": "rimraf **/node_modules/.cache && jest --clearCache &> /dev/null",
+    "nuke": "run-p -c clean:jest clean:nodemodules clean:dist && yarn",
+    "---------------CODEOWNERS--------------": ".",
+    "codeowners": "yarn generate-codeowners",
+    "--------------TYPECHECKING-------------": ".",
+    "typecheck": "tsc --noEmit",
+    "----------------BUILD TOOLS----------------": ".",
+    "build": "rollup -c",
+    "----------------LINTING----------------": ".",
+    "lint": "run-s lint:packagejson 'lint:eslint {@}' --",
+    "lint:eslint": "eslint --ext md,tsx,ts,js,ts,json --ignore-path .lintignore .",
+    "lint:packagejson": "npmPkgJsonLint ./packages",
+    "----------------Formatting----------------": ".",
+    "format": "prettier '**/*.{css,html,js,json,less,md,scss,ts,vue,yaml,yml}' --ignore-path .lintignore --check"
+  },
+  "repository": "https://github.com/Attest/annotations-action.git",
+  "keywords": [
+    "github",
+    "actions",
+    "annotations",
+    "tools",
+    "config",
+    "attest",
+    "askattest"
+  ],
+  "author": "Attest Engineering <dev@askattest.com> (https://askattest.com)",
+  "license": "MIT",
+  "homepage": "https://askattest.com",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/@attest/standard-commits"
+    }
+  },
+  "dependencies": {
+    "@octokit/core": "^2.2.0"
+  },
+  "devDependencies": {
+    "@attest/config-babel-preset-env-node": "^0.1.17",
+    "@attest/config-babel-preset-jest": "^0.1.17",
+    "@attest/config-babel-preset-typescript": "^0.1.1",
+    "@attest/config-jest": "^0.3.13",
+    "@attest/config-npm-package-json-lint": "^0.2.6",
+    "@attest/config-prettier": "^0.3.1",
+    "@attest/config-rollup-typescript": "^0.1.34",
+    "@attest/config-typescript": "^1.0.5",
+    "@attest/conventional-changelog": "^0.1.15",
+    "@attest/eslint-config": "^0.1.1",
+    "@attest/eslint-config-node": "^0.1.0",
+    "@attest/eslint-config-typescript": "^0.1.4",
+    "@attest/generate-codeowners": "^0.1.3",
+    "@attest/standard-commits": "^0.1.29",
+    "@babel/core": "^7.8.3",
+    "@semantic-release/changelog": "^5.0.0",
+    "@semantic-release/commit-analyzer": "^8.0.0",
+    "@semantic-release/git": "^9.0.0",
+    "@semantic-release/github": "^6.0.2",
+    "@semantic-release/release-notes-generator": "^9.0.0",
+    "husky": "^4.2.1",
+    "lint-staged": "^10.0.3",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.1",
+    "semantic-release": "^17.0.0",
+    "typescript": "^3.7.5"
+  },
+  "optionalDependencies": {
+    "eslint-plugin-react-hooks": "^2.3.0"
+  },
+  "engines": {
+    "node": ">=12.13 <13"
+  },
+  "contributors": [
+    "Blake Newman <blake.newman@askattest.com> (https://askattest.com)"
+  ]
+}

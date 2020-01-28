@@ -1,0 +1,9 @@
+# Attest Codeowners File for annotations-action
+# Automatically adds original contributors to pull requests for packages
+
+# Note: This file was automatically generated from the @attest/generate-codeowners tool, any edits will be overwritten
+
+# Global codeowners (fallback)
+* blake.newman@askattest.com
+
+
