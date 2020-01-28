@@ -20,3 +20,23 @@ Then install with
 ```
 yarn
 ```
+
+## Example workflow
+
+`workflow.yml`
+
+```
+name: workflow
+on: [push]
+jobs:
+  job:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Annotate
+        uses: Attest/annotations-action@v0.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          input: './annotations.json'
+          title: 'Annotate Files'
+```
