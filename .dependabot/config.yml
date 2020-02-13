@@ -7,5 +7,5 @@ update_configs:
     default_labels:
       - '🤖 Dependency update'
     commit_message:
-      prefix: 'chore'
+      prefix: 'build'
       include_scope: true
