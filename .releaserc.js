@@ -17,11 +17,18 @@ module.exports = {
         changelogFile: 'CHANGELOG.md',
       },
     ],
-    '@semantic-release/github',
     [
-      '@semantic-release/git',
+      '@semantic-release/github',
       {
-        assets: ['CHANGELOG.md', 'dist/**'],
+        assets: [
+          'CHANGELOG.md',
+          'dist/**',
+          'node_modules/**',
+          'package.json',
+          'yarn.lock',
+          'action.yml',
+          'LICENSE.md',
+        ],
       },
     ],
   ],
