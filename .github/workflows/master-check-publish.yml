@@ -50,6 +50,6 @@ jobs:
       - name: Build
         run: yarn build
       - name: Version
-        run: yarn semantic-release -d
+        run: yarn semantic-release
         env:
           GH_TOKEN: ${{ secrets.ADMIN_GH_TOKEN }}
