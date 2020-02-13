@@ -1,6 +1,6 @@
 import { Annotations } from '@/annotations'
-import { ChecksCreateResponse, ChecksUpdateParamsOutputAnnotations } from '@octokit/rest'
 import { Context } from '@actions/github/lib/context'
+import { Octokit } from '@octokit/rest'
 import github from '@actions/github'
 
 export class Github {
@@ -9,7 +9,7 @@ export class Github {
   private readonly owner: string
   private readonly repo: string
   private readonly sha: string
-  private check: ChecksCreateResponse | null = null
+  private check: Octokit.ChecksCreateResponse | null = null
 
   public constructor(token: string) {
     this.client = new github.GitHub({
@@ -23,7 +23,7 @@ export class Github {
 
   private static githubAnnotationFromAnnotation(
     annotations: Annotations,
-  ): ChecksUpdateParamsOutputAnnotations[] {
+  ): Octokit.ChecksUpdateParamsOutputAnnotations[] {
     return annotations.map(annotation => {
       const { level, message, path, column = {}, line = {} } = annotation
 
