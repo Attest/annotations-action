@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/Attest/annotations-action/compare/v1.0.1...v1.0.2) (2020-02-13)
+
+### Bug Fix - github release assets
+Reference: [fcee803](https://github.com/Attest/annotations-action/commit/fcee803)
+Ticket: [ch8743](https://app.clubhouse.io/attest/story/8743)
+
 ## [1.0.1](https://github.com/Attest/annotations-action/compare/v1.0.0...v1.0.1) (2020-02-13)
 
 ### Bug Fix - bundle dependencies
