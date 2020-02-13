@@ -1,8 +1,9 @@
 name: 'Annotations Action'
 description: 'Dynamically label pull requests affecting packages in a monorepo / workspace'
 author: 'Attest Engineering <dev@askattest.com> (https://askattest.com)'
-icon: 'edit-3'
-color: 'blue'
+branding:
+  icon: 'edit-3'
+  color: 'blue'
 inputs:
   secret:
     description: 'The GITHUB_TOKEN secret'
