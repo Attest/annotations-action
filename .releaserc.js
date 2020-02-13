@@ -7,13 +7,13 @@ module.exports = {
     [
       '@semantic-release/release-notes-generator',
       {
-        preset: '@attest/conventional-changelog',
+        config: '@attest/conventional-changelog',
       },
     ],
     [
       '@semantic-release/changelog',
       {
-        preset: '@attest/conventional-changelog',
+        config: '@attest/conventional-changelog',
         changelogFile: 'CHANGELOG.md',
       },
     ],
