@@ -1,0 +1,15 @@
+name: Pull Request Audit Dependencies
+on: [pull_request]
+
+jobs:
+  prCheck:
+    name: audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: |
+          echo "//npm.pkg.github.com/:_authToken=$NODE_AUTH_TOKEN" >> ~/.npmrc
+          echo "@attest:registry=https://npm.pkg.github.com/" >> ~/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.ADMIN_GH_TOKEN}}
+      - run: yarn audit

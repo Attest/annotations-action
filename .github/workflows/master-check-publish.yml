@@ -6,41 +6,7 @@ on:
       - master
 
 jobs:
-  healthcheck:
-    name: 'healthcheck'
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v1
-      - name: 'Cache yarn'
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: 'Cache node_modules'
-        uses: actions/cache@v1
-        with:
-          path: ${{ github.workspace }}/node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
-      - name: 'Setup registry'
-        run: |
-          echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/.npmrc
-          echo "@attest:registry=https://npm.pkg.github.com/" >> ~/.npmrc
-        env:
-          GITHUB_TOKEN: ${{ secrets.ADMIN_GH_TOKEN }}
-      - name: 'Install dependencies'
-        run: yarn install --frozen-lockfile
-      - name: 'Typecheck'
-        run: yarn typecheck
-      - name: 'Lint'
-        run: yarn lint
-      - name: 'Format'
-        run: yarn format
   publish:
-    needs: [healthcheck]
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
@@ -50,7 +16,7 @@ jobs:
           git config --global user.email admin@askattest.com
           git config --global user.name attest-admin
           git remote rm origin
-          git remote add origin "https://attest-admin:$GITHUB_TOKEN@github.com/attest/fe-tools.git"
+          git remote add origin "https://attest-admin:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
           git checkout -b master
           git push -u origin master
         env:
@@ -77,6 +43,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ADMIN_GH_TOKEN }}
       - name: 'Install dependencies'
         run: yarn install --frozen-lockfile
+      - name: 'Lint'
+        run: yarn lint
+      - name: 'Format'
+        run: yarn format
       - name: Build
         run: yarn build
       - name: Version
