@@ -1,3 +1,12 @@
+## [1.0.3](https://github.com/Attest/annotations-action/compare/v1.0.2...v1.0.3) (2020-02-14)
+
+### Bug Fix - add missing dist file
+
+add dist/index.js that we can distribute the action
+
+Reference: [421fd9f](https://github.com/Attest/annotations-action/commit/421fd9f)
+Ticket: [ch8743](https://app.clubhouse.io/attest/story/8743)
+
 ## [1.0.2](https://github.com/Attest/annotations-action/compare/v1.0.1...v1.0.2) (2020-02-13)
 
 ### Bug Fix - github release assets
