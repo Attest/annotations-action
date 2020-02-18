@@ -1,3 +1,14 @@
+## [1.0.4](https://github.com/Attest/annotations-action/compare/v1.0.3...v1.0.4) (2020-02-18)
+
+### Bug Fix - fix build issues
+
+fix build issues where dependencies where causing failures at runtime,
+add a navigator object to global scope so `@octokit/request` does not
+fail, as this is not available in node
+
+Reference: [2927f53](https://github.com/Attest/annotations-action/commit/2927f53)
+Ticket: [ch8743](https://app.clubhouse.io/attest/story/8743)
+
 ## [1.0.3](https://github.com/Attest/annotations-action/compare/v1.0.2...v1.0.3) (2020-02-14)
 
 ### Bug Fix - add missing dist file

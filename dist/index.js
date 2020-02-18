@@ -7,14 +7,13 @@ var http = _interopDefault(require('http'));
 var Url = _interopDefault(require('url'));
 var https = _interopDefault(require('https'));
 var zlib = _interopDefault(require('zlib'));
-var fs = _interopDefault(require('fs'));
 var os = _interopDefault(require('os'));
-require('net');
-var tls = _interopDefault(require('tls'));
-var events = _interopDefault(require('events'));
-require('assert');
-var util = _interopDefault(require('util'));
 var path = _interopDefault(require('path'));
+var child_process = _interopDefault(require('child_process'));
+var fs = _interopDefault(require('fs'));
+var assert = _interopDefault(require('assert'));
+var events = _interopDefault(require('events'));
+var util = _interopDefault(require('util'));
 
 class Annotations extends Array {
   static fromJSON(json) {
@@ -118,105 +117,94 @@ var distWeb = /*#__PURE__*/Object.freeze({
   getUserAgent: getUserAgent
 });
 
-var distNode = createCommonjsModule(function (module, exports) {
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var isPlainObject$1 = _interopDefault(isPlainObject);
-
-
 function lowercaseKeys(object) {
-  if (!object) {
-    return {};
-  }
-
-  return Object.keys(object).reduce((newObj, key) => {
-    newObj[key.toLowerCase()] = object[key];
-    return newObj;
-  }, {});
+    if (!object) {
+        return {};
+    }
+    return Object.keys(object).reduce((newObj, key) => {
+        newObj[key.toLowerCase()] = object[key];
+        return newObj;
+    }, {});
 }
 
 function mergeDeep(defaults, options) {
-  const result = Object.assign({}, defaults);
-  Object.keys(options).forEach(key => {
-    if (isPlainObject$1(options[key])) {
-      if (!(key in defaults)) Object.assign(result, {
-        [key]: options[key]
-      });else result[key] = mergeDeep(defaults[key], options[key]);
-    } else {
-      Object.assign(result, {
-        [key]: options[key]
-      });
-    }
-  });
-  return result;
+    const result = Object.assign({}, defaults);
+    Object.keys(options).forEach(key => {
+        if (isPlainObject(options[key])) {
+            if (!(key in defaults))
+                Object.assign(result, { [key]: options[key] });
+            else
+                result[key] = mergeDeep(defaults[key], options[key]);
+        }
+        else {
+            Object.assign(result, { [key]: options[key] });
+        }
+    });
+    return result;
 }
 
 function merge(defaults, route, options) {
-  if (typeof route === "string") {
-    let [method, url] = route.split(" ");
-    options = Object.assign(url ? {
-      method,
-      url
-    } : {
-      url: method
-    }, options);
-  } else {
-    options = Object.assign({}, route);
-  } // lowercase header names before merging with defaults to avoid duplicates
-
-
-  options.headers = lowercaseKeys(options.headers);
-  const mergedOptions = mergeDeep(defaults || {}, options); // mediaType.previews arrays are merged, instead of overwritten
-
-  if (defaults && defaults.mediaType.previews.length) {
-    mergedOptions.mediaType.previews = defaults.mediaType.previews.filter(preview => !mergedOptions.mediaType.previews.includes(preview)).concat(mergedOptions.mediaType.previews);
-  }
-
-  mergedOptions.mediaType.previews = mergedOptions.mediaType.previews.map(preview => preview.replace(/-preview/, ""));
-  return mergedOptions;
+    if (typeof route === "string") {
+        let [method, url] = route.split(" ");
+        options = Object.assign(url ? { method, url } : { url: method }, options);
+    }
+    else {
+        options = Object.assign({}, route);
+    }
+    // lowercase header names before merging with defaults to avoid duplicates
+    options.headers = lowercaseKeys(options.headers);
+    const mergedOptions = mergeDeep(defaults || {}, options);
+    // mediaType.previews arrays are merged, instead of overwritten
+    if (defaults && defaults.mediaType.previews.length) {
+        mergedOptions.mediaType.previews = defaults.mediaType.previews
+            .filter(preview => !mergedOptions.mediaType.previews.includes(preview))
+            .concat(mergedOptions.mediaType.previews);
+    }
+    mergedOptions.mediaType.previews = mergedOptions.mediaType.previews.map((preview) => preview.replace(/-preview/, ""));
+    return mergedOptions;
 }
 
 function addQueryParameters(url, parameters) {
-  const separator = /\?/.test(url) ? "&" : "?";
-  const names = Object.keys(parameters);
-
-  if (names.length === 0) {
-    return url;
-  }
-
-  return url + separator + names.map(name => {
-    if (name === "q") {
-      return "q=" + parameters.q.split("+").map(encodeURIComponent).join("+");
+    const separator = /\?/.test(url) ? "&" : "?";
+    const names = Object.keys(parameters);
+    if (names.length === 0) {
+        return url;
     }
-
-    return `${name}=${encodeURIComponent(parameters[name])}`;
-  }).join("&");
+    return (url +
+        separator +
+        names
+            .map(name => {
+            if (name === "q") {
+                return ("q=" +
+                    parameters
+                        .q.split("+")
+                        .map(encodeURIComponent)
+                        .join("+"));
+            }
+            return `${name}=${encodeURIComponent(parameters[name])}`;
+        })
+            .join("&"));
 }
 
 const urlVariableRegex = /\{[^}]+\}/g;
-
 function removeNonChars(variableName) {
-  return variableName.replace(/^\W+|\W+$/g, "").split(/,/);
+    return variableName.replace(/^\W+|\W+$/g, "").split(/,/);
 }
-
 function extractUrlVariableNames(url) {
-  const matches = url.match(urlVariableRegex);
-
-  if (!matches) {
-    return [];
-  }
-
-  return matches.map(removeNonChars).reduce((a, b) => a.concat(b), []);
+    const matches = url.match(urlVariableRegex);
+    if (!matches) {
+        return [];
+    }
+    return matches.map(removeNonChars).reduce((a, b) => a.concat(b), []);
 }
 
 function omit(object, keysToOmit) {
-  return Object.keys(object).filter(option => !keysToOmit.includes(option)).reduce((obj, key) => {
-    obj[key] = object[key];
-    return obj;
-  }, {});
+    return Object.keys(object)
+        .filter(option => !keysToOmit.includes(option))
+        .reduce((obj, key) => {
+        obj[key] = object[key];
+        return obj;
+    }, {});
 }
 
 // Based on https://github.com/bramstein/url-template, licensed under BSD
@@ -244,263 +232,269 @@ function omit(object, keysToOmit) {
 // OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 // EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 /* istanbul ignore file */
 function encodeReserved(str) {
-  return str.split(/(%[0-9A-Fa-f]{2})/g).map(function (part) {
-    if (!/%[0-9A-Fa-f]/.test(part)) {
-      part = encodeURI(part).replace(/%5B/g, "[").replace(/%5D/g, "]");
-    }
-
-    return part;
-  }).join("");
+    return str
+        .split(/(%[0-9A-Fa-f]{2})/g)
+        .map(function (part) {
+        if (!/%[0-9A-Fa-f]/.test(part)) {
+            part = encodeURI(part)
+                .replace(/%5B/g, "[")
+                .replace(/%5D/g, "]");
+        }
+        return part;
+    })
+        .join("");
 }
-
 function encodeUnreserved(str) {
-  return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
-    return "%" + c.charCodeAt(0).toString(16).toUpperCase();
-  });
+    return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+        return ("%" +
+            c
+                .charCodeAt(0)
+                .toString(16)
+                .toUpperCase());
+    });
 }
-
 function encodeValue(operator, value, key) {
-  value = operator === "+" || operator === "#" ? encodeReserved(value) : encodeUnreserved(value);
-
-  if (key) {
-    return encodeUnreserved(key) + "=" + value;
-  } else {
-    return value;
-  }
+    value =
+        operator === "+" || operator === "#"
+            ? encodeReserved(value)
+            : encodeUnreserved(value);
+    if (key) {
+        return encodeUnreserved(key) + "=" + value;
+    }
+    else {
+        return value;
+    }
 }
-
 function isDefined(value) {
-  return value !== undefined && value !== null;
+    return value !== undefined && value !== null;
 }
-
 function isKeyOperator(operator) {
-  return operator === ";" || operator === "&" || operator === "?";
+    return operator === ";" || operator === "&" || operator === "?";
 }
-
 function getValues(context, operator, key, modifier) {
-  var value = context[key],
-      result = [];
-
-  if (isDefined(value) && value !== "") {
-    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-      value = value.toString();
-
-      if (modifier && modifier !== "*") {
-        value = value.substring(0, parseInt(modifier, 10));
-      }
-
-      result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : ""));
-    } else {
-      if (modifier === "*") {
-        if (Array.isArray(value)) {
-          value.filter(isDefined).forEach(function (value) {
+    var value = context[key], result = [];
+    if (isDefined(value) && value !== "") {
+        if (typeof value === "string" ||
+            typeof value === "number" ||
+            typeof value === "boolean") {
+            value = value.toString();
+            if (modifier && modifier !== "*") {
+                value = value.substring(0, parseInt(modifier, 10));
+            }
             result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : ""));
-          });
-        } else {
-          Object.keys(value).forEach(function (k) {
-            if (isDefined(value[k])) {
-              result.push(encodeValue(operator, value[k], k));
+        }
+        else {
+            if (modifier === "*") {
+                if (Array.isArray(value)) {
+                    value.filter(isDefined).forEach(function (value) {
+                        result.push(encodeValue(operator, value, isKeyOperator(operator) ? key : ""));
+                    });
+                }
+                else {
+                    Object.keys(value).forEach(function (k) {
+                        if (isDefined(value[k])) {
+                            result.push(encodeValue(operator, value[k], k));
+                        }
+                    });
+                }
             }
-          });
-        }
-      } else {
-        const tmp = [];
-
-        if (Array.isArray(value)) {
-          value.filter(isDefined).forEach(function (value) {
-            tmp.push(encodeValue(operator, value));
-          });
-        } else {
-          Object.keys(value).forEach(function (k) {
-            if (isDefined(value[k])) {
-              tmp.push(encodeUnreserved(k));
-              tmp.push(encodeValue(operator, value[k].toString()));
+            else {
+                const tmp = [];
+                if (Array.isArray(value)) {
+                    value.filter(isDefined).forEach(function (value) {
+                        tmp.push(encodeValue(operator, value));
+                    });
+                }
+                else {
+                    Object.keys(value).forEach(function (k) {
+                        if (isDefined(value[k])) {
+                            tmp.push(encodeUnreserved(k));
+                            tmp.push(encodeValue(operator, value[k].toString()));
+                        }
+                    });
+                }
+                if (isKeyOperator(operator)) {
+                    result.push(encodeUnreserved(key) + "=" + tmp.join(","));
+                }
+                else if (tmp.length !== 0) {
+                    result.push(tmp.join(","));
+                }
             }
-          });
         }
-
-        if (isKeyOperator(operator)) {
-          result.push(encodeUnreserved(key) + "=" + tmp.join(","));
-        } else if (tmp.length !== 0) {
-          result.push(tmp.join(","));
+    }
+    else {
+        if (operator === ";") {
+            if (isDefined(value)) {
+                result.push(encodeUnreserved(key));
+            }
         }
-      }
+        else if (value === "" && (operator === "&" || operator === "?")) {
+            result.push(encodeUnreserved(key) + "=");
+        }
+        else if (value === "") {
+            result.push("");
+        }
     }
-  } else {
-    if (operator === ";") {
-      if (isDefined(value)) {
-        result.push(encodeUnreserved(key));
-      }
-    } else if (value === "" && (operator === "&" || operator === "?")) {
-      result.push(encodeUnreserved(key) + "=");
-    } else if (value === "") {
-      result.push("");
-    }
-  }
-
-  return result;
+    return result;
 }
-
 function parseUrl(template) {
-  return {
-    expand: expand.bind(null, template)
-  };
+    return {
+        expand: expand.bind(null, template)
+    };
 }
-
 function expand(template, context) {
-  var operators = ["+", "#", ".", "/", ";", "?", "&"];
-  return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function (_, expression, literal) {
-    if (expression) {
-      let operator = "";
-      const values = [];
-
-      if (operators.indexOf(expression.charAt(0)) !== -1) {
-        operator = expression.charAt(0);
-        expression = expression.substr(1);
-      }
-
-      expression.split(/,/g).forEach(function (variable) {
-        var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
-        values.push(getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
-      });
-
-      if (operator && operator !== "+") {
-        var separator = ",";
-
-        if (operator === "?") {
-          separator = "&";
-        } else if (operator !== "#") {
-          separator = operator;
+    var operators = ["+", "#", ".", "/", ";", "?", "&"];
+    return template.replace(/\{([^\{\}]+)\}|([^\{\}]+)/g, function (_, expression, literal) {
+        if (expression) {
+            let operator = "";
+            const values = [];
+            if (operators.indexOf(expression.charAt(0)) !== -1) {
+                operator = expression.charAt(0);
+                expression = expression.substr(1);
+            }
+            expression.split(/,/g).forEach(function (variable) {
+                var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
+                values.push(getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
+            });
+            if (operator && operator !== "+") {
+                var separator = ",";
+                if (operator === "?") {
+                    separator = "&";
+                }
+                else if (operator !== "#") {
+                    separator = operator;
+                }
+                return (values.length !== 0 ? operator : "") + values.join(separator);
+            }
+            else {
+                return values.join(",");
+            }
         }
-
-        return (values.length !== 0 ? operator : "") + values.join(separator);
-      } else {
-        return values.join(",");
-      }
-    } else {
-      return encodeReserved(literal);
-    }
-  });
+        else {
+            return encodeReserved(literal);
+        }
+    });
 }
 
 function parse(options) {
-  // https://fetch.spec.whatwg.org/#methods
-  let method = options.method.toUpperCase(); // replace :varname with {varname} to make it RFC 6570 compatible
-
-  let url = (options.url || "/").replace(/:([a-z]\w+)/g, "{+$1}");
-  let headers = Object.assign({}, options.headers);
-  let body;
-  let parameters = omit(options, ["method", "baseUrl", "url", "headers", "request", "mediaType"]); // extract variable names from URL to calculate remaining variables later
-
-  const urlVariableNames = extractUrlVariableNames(url);
-  url = parseUrl(url).expand(parameters);
-
-  if (!/^http/.test(url)) {
-    url = options.baseUrl + url;
-  }
-
-  const omittedParameters = Object.keys(options).filter(option => urlVariableNames.includes(option)).concat("baseUrl");
-  const remainingParameters = omit(parameters, omittedParameters);
-  const isBinaryRequset = /application\/octet-stream/i.test(headers.accept);
-
-  if (!isBinaryRequset) {
-    if (options.mediaType.format) {
-      // e.g. application/vnd.github.v3+json => application/vnd.github.v3.raw
-      headers.accept = headers.accept.split(/,/).map(preview => preview.replace(/application\/vnd(\.\w+)(\.v3)?(\.\w+)?(\+json)?$/, `application/vnd$1$2.${options.mediaType.format}`)).join(",");
+    // https://fetch.spec.whatwg.org/#methods
+    let method = options.method.toUpperCase();
+    // replace :varname with {varname} to make it RFC 6570 compatible
+    let url = (options.url || "/").replace(/:([a-z]\w+)/g, "{+$1}");
+    let headers = Object.assign({}, options.headers);
+    let body;
+    let parameters = omit(options, [
+        "method",
+        "baseUrl",
+        "url",
+        "headers",
+        "request",
+        "mediaType"
+    ]);
+    // extract variable names from URL to calculate remaining variables later
+    const urlVariableNames = extractUrlVariableNames(url);
+    url = parseUrl(url).expand(parameters);
+    if (!/^http/.test(url)) {
+        url = options.baseUrl + url;
     }
-
-    if (options.mediaType.previews.length) {
-      const previewsFromAcceptHeader = headers.accept.match(/[\w-]+(?=-preview)/g) || [];
-      headers.accept = previewsFromAcceptHeader.concat(options.mediaType.previews).map(preview => {
-        const format = options.mediaType.format ? `.${options.mediaType.format}` : "+json";
-        return `application/vnd.github.${preview}-preview${format}`;
-      }).join(",");
+    const omittedParameters = Object.keys(options)
+        .filter(option => urlVariableNames.includes(option))
+        .concat("baseUrl");
+    const remainingParameters = omit(parameters, omittedParameters);
+    const isBinaryRequset = /application\/octet-stream/i.test(headers.accept);
+    if (!isBinaryRequset) {
+        if (options.mediaType.format) {
+            // e.g. application/vnd.github.v3+json => application/vnd.github.v3.raw
+            headers.accept = headers.accept
+                .split(/,/)
+                .map(preview => preview.replace(/application\/vnd(\.\w+)(\.v3)?(\.\w+)?(\+json)?$/, `application/vnd$1$2.${options.mediaType.format}`))
+                .join(",");
+        }
+        if (options.mediaType.previews.length) {
+            const previewsFromAcceptHeader = headers.accept.match(/[\w-]+(?=-preview)/g) || [];
+            headers.accept = previewsFromAcceptHeader
+                .concat(options.mediaType.previews)
+                .map(preview => {
+                const format = options.mediaType.format
+                    ? `.${options.mediaType.format}`
+                    : "+json";
+                return `application/vnd.github.${preview}-preview${format}`;
+            })
+                .join(",");
+        }
     }
-  } // for GET/HEAD requests, set URL query parameters from remaining parameters
-  // for PATCH/POST/PUT/DELETE requests, set request body from remaining parameters
-
-
-  if (["GET", "HEAD"].includes(method)) {
-    url = addQueryParameters(url, remainingParameters);
-  } else {
-    if ("data" in remainingParameters) {
-      body = remainingParameters.data;
-    } else {
-      if (Object.keys(remainingParameters).length) {
-        body = remainingParameters;
-      } else {
-        headers["content-length"] = 0;
-      }
+    // for GET/HEAD requests, set URL query parameters from remaining parameters
+    // for PATCH/POST/PUT/DELETE requests, set request body from remaining parameters
+    if (["GET", "HEAD"].includes(method)) {
+        url = addQueryParameters(url, remainingParameters);
     }
-  } // default content-type for JSON if body is set
-
-
-  if (!headers["content-type"] && typeof body !== "undefined") {
-    headers["content-type"] = "application/json; charset=utf-8";
-  } // GitHub expects 'content-length: 0' header for PUT/PATCH requests without body.
-  // fetch does not allow to set `content-length` header, but we can set body to an empty string
-
-
-  if (["PATCH", "PUT"].includes(method) && typeof body === "undefined") {
-    body = "";
-  } // Only return body/request keys if present
-
-
-  return Object.assign({
-    method,
-    url,
-    headers
-  }, typeof body !== "undefined" ? {
-    body
-  } : null, options.request ? {
-    request: options.request
-  } : null);
+    else {
+        if ("data" in remainingParameters) {
+            body = remainingParameters.data;
+        }
+        else {
+            if (Object.keys(remainingParameters).length) {
+                body = remainingParameters;
+            }
+            else {
+                headers["content-length"] = 0;
+            }
+        }
+    }
+    // default content-type for JSON if body is set
+    if (!headers["content-type"] && typeof body !== "undefined") {
+        headers["content-type"] = "application/json; charset=utf-8";
+    }
+    // GitHub expects 'content-length: 0' header for PUT/PATCH requests without body.
+    // fetch does not allow to set `content-length` header, but we can set body to an empty string
+    if (["PATCH", "PUT"].includes(method) && typeof body === "undefined") {
+        body = "";
+    }
+    // Only return body/request keys if present
+    return Object.assign({ method, url, headers }, typeof body !== "undefined" ? { body } : null, options.request ? { request: options.request } : null);
 }
 
 function endpointWithDefaults(defaults, route, options) {
-  return parse(merge(defaults, route, options));
+    return parse(merge(defaults, route, options));
 }
 
 function withDefaults(oldDefaults, newDefaults) {
-  const DEFAULTS = merge(oldDefaults, newDefaults);
-  const endpoint = endpointWithDefaults.bind(null, DEFAULTS);
-  return Object.assign(endpoint, {
-    DEFAULTS,
-    defaults: withDefaults.bind(null, DEFAULTS),
-    merge: merge.bind(null, DEFAULTS),
-    parse
-  });
+    const DEFAULTS = merge(oldDefaults, newDefaults);
+    const endpoint = endpointWithDefaults.bind(null, DEFAULTS);
+    return Object.assign(endpoint, {
+        DEFAULTS,
+        defaults: withDefaults.bind(null, DEFAULTS),
+        merge: merge.bind(null, DEFAULTS),
+        parse
+    });
 }
 
-const VERSION = "5.5.1";
+const VERSION = "5.5.2";
 
-const userAgent = `octokit-endpoint.js/${VERSION} ${distWeb.getUserAgent()}`; // DEFAULTS has all properties set that EndpointOptions has, except url.
+const userAgent = `octokit-endpoint.js/${VERSION} ${getUserAgent()}`;
+// DEFAULTS has all properties set that EndpointOptions has, except url.
 // So we use RequestParameters and add method as additional required property.
-
 const DEFAULTS = {
-  method: "GET",
-  baseUrl: "https://api.github.com",
-  headers: {
-    accept: "application/vnd.github.v3+json",
-    "user-agent": userAgent
-  },
-  mediaType: {
-    format: "",
-    previews: []
-  }
+    method: "GET",
+    baseUrl: "https://api.github.com",
+    headers: {
+        accept: "application/vnd.github.v3+json",
+        "user-agent": userAgent
+    },
+    mediaType: {
+        format: "",
+        previews: []
+    }
 };
 
 const endpoint = withDefaults(null, DEFAULTS);
 
-exports.endpoint = endpoint;
-
+var distWeb$1 = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  endpoint: endpoint
 });
-
-unwrapExports(distNode);
-var distNode_1 = distNode.endpoint;
 
 /*!
  * isobject <https://github.com/jonschlinkert/isobject>
@@ -2194,7 +2188,7 @@ class Deprecation extends Error {
 
 }
 
-var distWeb$1 = /*#__PURE__*/Object.freeze({
+var distWeb$2 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   Deprecation: Deprecation
 });
@@ -2276,69 +2270,53 @@ function onceStrict (fn) {
 }
 once_1.strict = strict;
 
-var distNode$1 = createCommonjsModule(function (module, exports) {
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-
-var once = _interopDefault(once_1);
-
-const logOnce = once(deprecation => console.warn(deprecation));
+const logOnce = once_1((deprecation) => console.warn(deprecation));
 /**
  * Error with extra properties to help with debugging
  */
-
 class RequestError extends Error {
-  constructor(message, statusCode, options) {
-    super(message); // Maintains proper stack trace (only available on V8)
-
-    /* istanbul ignore next */
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
+    constructor(message, statusCode, options) {
+        super(message);
+        // Maintains proper stack trace (only available on V8)
+        /* istanbul ignore next */
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, this.constructor);
+        }
+        this.name = "HttpError";
+        this.status = statusCode;
+        Object.defineProperty(this, "code", {
+            get() {
+                logOnce(new Deprecation("[@octokit/request-error] `error.code` is deprecated, use `error.status`."));
+                return statusCode;
+            }
+        });
+        this.headers = options.headers || {};
+        // redact request credentials without mutating original request options
+        const requestCopy = Object.assign({}, options.request);
+        if (options.request.headers.authorization) {
+            requestCopy.headers = Object.assign({}, options.request.headers, {
+                authorization: options.request.headers.authorization.replace(/ .*$/, " [REDACTED]")
+            });
+        }
+        requestCopy.url = requestCopy.url
+            // client_id & client_secret can be passed as URL query parameters to increase rate limit
+            // see https://developer.github.com/v3/#increasing-the-unauthenticated-rate-limit-for-oauth-applications
+            .replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]")
+            // OAuth tokens can be passed as URL query parameters, although it is not recommended
+            // see https://developer.github.com/v3/#oauth2-token-sent-in-a-header
+            .replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
+        this.request = requestCopy;
     }
-
-    this.name = "HttpError";
-    this.status = statusCode;
-    Object.defineProperty(this, "code", {
-      get() {
-        logOnce(new distWeb$1.Deprecation("[@octokit/request-error] `error.code` is deprecated, use `error.status`."));
-        return statusCode;
-      }
-
-    });
-    this.headers = options.headers || {}; // redact request credentials without mutating original request options
-
-    const requestCopy = Object.assign({}, options.request);
-
-    if (options.request.headers.authorization) {
-      requestCopy.headers = Object.assign({}, options.request.headers, {
-        authorization: options.request.headers.authorization.replace(/ .*$/, " [REDACTED]")
-      });
-    }
-
-    requestCopy.url = requestCopy.url // client_id & client_secret can be passed as URL query parameters to increase rate limit
-    // see https://developer.github.com/v3/#increasing-the-unauthenticated-rate-limit-for-oauth-applications
-    .replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]") // OAuth tokens can be passed as URL query parameters, although it is not recommended
-    // see https://developer.github.com/v3/#oauth2-token-sent-in-a-header
-    .replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
-    this.request = requestCopy;
-  }
-
 }
 
-exports.RequestError = RequestError;
-
+var distWeb$3 = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  RequestError: RequestError
 });
-
-unwrapExports(distNode$1);
-var distNode_1$1 = distNode$1.RequestError;
 
 var require$$1 = getCjsExportFromNamespace(lib);
 
-var distNode$2 = createCommonjsModule(function (module, exports) {
+var distNode = createCommonjsModule(function (module, exports) {
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
@@ -2388,14 +2366,14 @@ function fetchWrapper(requestOptions) {
         return;
       }
 
-      throw new distNode$1.RequestError(response.statusText, status, {
+      throw new distWeb$3.RequestError(response.statusText, status, {
         headers,
         request: requestOptions
       });
     }
 
     if (status === 304) {
-      throw new distNode$1.RequestError("Not modified", status, {
+      throw new distWeb$3.RequestError("Not modified", status, {
         headers,
         request: requestOptions
       });
@@ -2403,7 +2381,7 @@ function fetchWrapper(requestOptions) {
 
     if (status >= 400) {
       return response.text().then(message => {
-        const error = new distNode$1.RequestError(message, status, {
+        const error = new distWeb$3.RequestError(message, status, {
           headers,
           request: requestOptions
         });
@@ -2440,11 +2418,11 @@ function fetchWrapper(requestOptions) {
       data
     };
   }).catch(error => {
-    if (error instanceof distNode$1.RequestError) {
+    if (error instanceof distWeb$3.RequestError) {
       throw error;
     }
 
-    throw new distNode$1.RequestError(error.message, 500, {
+    throw new distWeb$3.RequestError(error.message, 500, {
       headers,
       request: requestOptions
     });
@@ -2478,7 +2456,7 @@ function withDefaults(oldEndpoint, newDefaults) {
   });
 }
 
-const request = withDefaults(distNode.endpoint, {
+const request = withDefaults(distWeb$1.endpoint, {
   headers: {
     "user-agent": `octokit-request.js/${VERSION} ${distWeb.getUserAgent()}`
   }
@@ -2488,44 +2466,3523 @@ exports.request = request;
 
 });
 
-unwrapExports(distNode$2);
-var distNode_1$2 = distNode$2.request;
+unwrapExports(distNode);
+var distNode_1 = distNode.request;
 
-var distNode$3 = createCommonjsModule(function (module, exports) {
+const nameMap = new Map([
+	[19, 'Catalina'],
+	[18, 'Mojave'],
+	[17, 'High Sierra'],
+	[16, 'Sierra'],
+	[15, 'El Capitan'],
+	[14, 'Yosemite'],
+	[13, 'Mavericks'],
+	[12, 'Mountain Lion'],
+	[11, 'Lion'],
+	[10, 'Snow Leopard'],
+	[9, 'Leopard'],
+	[8, 'Tiger'],
+	[7, 'Panther'],
+	[6, 'Jaguar'],
+	[5, 'Puma']
+]);
 
-Object.defineProperty(exports, '__esModule', { value: true });
+const macosRelease = release => {
+	release = Number((release || os.release()).split('.')[0]);
+	return {
+		name: nameMap.get(release),
+		version: '10.' + (release - 4)
+	};
+};
+
+var macosRelease_1 = macosRelease;
+// TODO: remove this in the next major version
+var default_1 = macosRelease;
+macosRelease_1.default = default_1;
+
+/**
+ * Tries to execute a function and discards any error that occurs.
+ * @param {Function} fn - Function that might or might not throw an error.
+ * @returns {?*} Return-value of the function when no error occurred.
+ */
+var src = function(fn) {
+
+	try { return fn() } catch (e) {}
+
+};
+
+var windows = isexe;
+isexe.sync = sync;
+
+
+
+function checkPathExt (path, options) {
+  var pathext = options.pathExt !== undefined ?
+    options.pathExt : process.env.PATHEXT;
+
+  if (!pathext) {
+    return true
+  }
+
+  pathext = pathext.split(';');
+  if (pathext.indexOf('') !== -1) {
+    return true
+  }
+  for (var i = 0; i < pathext.length; i++) {
+    var p = pathext[i].toLowerCase();
+    if (p && path.substr(-p.length).toLowerCase() === p) {
+      return true
+    }
+  }
+  return false
+}
+
+function checkStat (stat, path, options) {
+  if (!stat.isSymbolicLink() && !stat.isFile()) {
+    return false
+  }
+  return checkPathExt(path, options)
+}
+
+function isexe (path, options, cb) {
+  fs.stat(path, function (er, stat) {
+    cb(er, er ? false : checkStat(stat, path, options));
+  });
+}
+
+function sync (path, options) {
+  return checkStat(fs.statSync(path), path, options)
+}
+
+var mode = isexe$1;
+isexe$1.sync = sync$1;
+
+
+
+function isexe$1 (path, options, cb) {
+  fs.stat(path, function (er, stat) {
+    cb(er, er ? false : checkStat$1(stat, options));
+  });
+}
+
+function sync$1 (path, options) {
+  return checkStat$1(fs.statSync(path), options)
+}
+
+function checkStat$1 (stat, options) {
+  return stat.isFile() && checkMode(stat, options)
+}
+
+function checkMode (stat, options) {
+  var mod = stat.mode;
+  var uid = stat.uid;
+  var gid = stat.gid;
+
+  var myUid = options.uid !== undefined ?
+    options.uid : process.getuid && process.getuid();
+  var myGid = options.gid !== undefined ?
+    options.gid : process.getgid && process.getgid();
+
+  var u = parseInt('100', 8);
+  var g = parseInt('010', 8);
+  var o = parseInt('001', 8);
+  var ug = u | g;
+
+  var ret = (mod & o) ||
+    (mod & g) && gid === myGid ||
+    (mod & u) && uid === myUid ||
+    (mod & ug) && myUid === 0;
+
+  return ret
+}
+
+var core;
+if (process.platform === 'win32' || commonjsGlobal.TESTING_WINDOWS) {
+  core = windows;
+} else {
+  core = mode;
+}
+
+var isexe_1 = isexe$2;
+isexe$2.sync = sync$2;
+
+function isexe$2 (path, options, cb) {
+  if (typeof options === 'function') {
+    cb = options;
+    options = {};
+  }
+
+  if (!cb) {
+    if (typeof Promise !== 'function') {
+      throw new TypeError('callback not provided')
+    }
+
+    return new Promise(function (resolve, reject) {
+      isexe$2(path, options || {}, function (er, is) {
+        if (er) {
+          reject(er);
+        } else {
+          resolve(is);
+        }
+      });
+    })
+  }
+
+  core(path, options || {}, function (er, is) {
+    // ignore EACCES because that just means we aren't allowed to run it
+    if (er) {
+      if (er.code === 'EACCES' || options && options.ignoreErrors) {
+        er = null;
+        is = false;
+      }
+    }
+    cb(er, is);
+  });
+}
+
+function sync$2 (path, options) {
+  // my kingdom for a filtered catch
+  try {
+    return core.sync(path, options || {})
+  } catch (er) {
+    if (options && options.ignoreErrors || er.code === 'EACCES') {
+      return false
+    } else {
+      throw er
+    }
+  }
+}
+
+var which_1 = which;
+which.sync = whichSync;
+
+var isWindows = process.platform === 'win32' ||
+    process.env.OSTYPE === 'cygwin' ||
+    process.env.OSTYPE === 'msys';
+
+
+var COLON = isWindows ? ';' : ':';
+
+
+function getNotFoundError (cmd) {
+  var er = new Error('not found: ' + cmd);
+  er.code = 'ENOENT';
+
+  return er
+}
+
+function getPathInfo (cmd, opt) {
+  var colon = opt.colon || COLON;
+  var pathEnv = opt.path || process.env.PATH || '';
+  var pathExt = [''];
+
+  pathEnv = pathEnv.split(colon);
+
+  var pathExtExe = '';
+  if (isWindows) {
+    pathEnv.unshift(process.cwd());
+    pathExtExe = (opt.pathExt || process.env.PATHEXT || '.EXE;.CMD;.BAT;.COM');
+    pathExt = pathExtExe.split(colon);
+
+
+    // Always test the cmd itself first.  isexe will check to make sure
+    // it's found in the pathExt set.
+    if (cmd.indexOf('.') !== -1 && pathExt[0] !== '')
+      pathExt.unshift('');
+  }
+
+  // If it has a slash, then we don't bother searching the pathenv.
+  // just check the file itself, and that's it.
+  if (cmd.match(/\//) || isWindows && cmd.match(/\\/))
+    pathEnv = [''];
+
+  return {
+    env: pathEnv,
+    ext: pathExt,
+    extExe: pathExtExe
+  }
+}
+
+function which (cmd, opt, cb) {
+  if (typeof opt === 'function') {
+    cb = opt;
+    opt = {};
+  }
+
+  var info = getPathInfo(cmd, opt);
+  var pathEnv = info.env;
+  var pathExt = info.ext;
+  var pathExtExe = info.extExe;
+  var found = []
+
+  ;(function F (i, l) {
+    if (i === l) {
+      if (opt.all && found.length)
+        return cb(null, found)
+      else
+        return cb(getNotFoundError(cmd))
+    }
+
+    var pathPart = pathEnv[i];
+    if (pathPart.charAt(0) === '"' && pathPart.slice(-1) === '"')
+      pathPart = pathPart.slice(1, -1);
+
+    var p = path.join(pathPart, cmd);
+    if (!pathPart && (/^\.[\\\/]/).test(cmd)) {
+      p = cmd.slice(0, 2) + p;
+    }
+(function E (ii, ll) {
+      if (ii === ll) return F(i + 1, l)
+      var ext = pathExt[ii];
+      isexe_1(p + ext, { pathExt: pathExtExe }, function (er, is) {
+        if (!er && is) {
+          if (opt.all)
+            found.push(p + ext);
+          else
+            return cb(null, p + ext)
+        }
+        return E(ii + 1, ll)
+      });
+    })(0, pathExt.length);
+  })(0, pathEnv.length);
+}
+
+function whichSync (cmd, opt) {
+  opt = opt || {};
+
+  var info = getPathInfo(cmd, opt);
+  var pathEnv = info.env;
+  var pathExt = info.ext;
+  var pathExtExe = info.extExe;
+  var found = [];
+
+  for (var i = 0, l = pathEnv.length; i < l; i ++) {
+    var pathPart = pathEnv[i];
+    if (pathPart.charAt(0) === '"' && pathPart.slice(-1) === '"')
+      pathPart = pathPart.slice(1, -1);
+
+    var p = path.join(pathPart, cmd);
+    if (!pathPart && /^\.[\\\/]/.test(cmd)) {
+      p = cmd.slice(0, 2) + p;
+    }
+    for (var j = 0, ll = pathExt.length; j < ll; j ++) {
+      var cur = p + pathExt[j];
+      var is;
+      try {
+        is = isexe_1.sync(cur, { pathExt: pathExtExe });
+        if (is) {
+          if (opt.all)
+            found.push(cur);
+          else
+            return cur
+        }
+      } catch (ex) {}
+    }
+  }
+
+  if (opt.all && found.length)
+    return found
+
+  if (opt.nothrow)
+    return null
+
+  throw getNotFoundError(cmd)
+}
+
+var pathKey = opts => {
+	opts = opts || {};
+
+	const env = opts.env || process.env;
+	const platform = opts.platform || process.platform;
+
+	if (platform !== 'win32') {
+		return 'PATH';
+	}
+
+	return Object.keys(env).find(x => x.toUpperCase() === 'PATH') || 'Path';
+};
+
+const pathKey$1 = pathKey();
+
+function resolveCommandAttempt(parsed, withoutPathExt) {
+    const cwd = process.cwd();
+    const hasCustomCwd = parsed.options.cwd != null;
+
+    // If a custom `cwd` was specified, we need to change the process cwd
+    // because `which` will do stat calls but does not support a custom cwd
+    if (hasCustomCwd) {
+        try {
+            process.chdir(parsed.options.cwd);
+        } catch (err) {
+            /* Empty */
+        }
+    }
+
+    let resolved;
+
+    try {
+        resolved = which_1.sync(parsed.command, {
+            path: (parsed.options.env || process.env)[pathKey$1],
+            pathExt: withoutPathExt ? path.delimiter : undefined,
+        });
+    } catch (e) {
+        /* Empty */
+    } finally {
+        process.chdir(cwd);
+    }
+
+    // If we successfully resolved, ensure that an absolute path is returned
+    // Note that when a custom `cwd` was used, we need to resolve to an absolute path based on it
+    if (resolved) {
+        resolved = path.resolve(hasCustomCwd ? parsed.options.cwd : '', resolved);
+    }
+
+    return resolved;
+}
+
+function resolveCommand(parsed) {
+    return resolveCommandAttempt(parsed) || resolveCommandAttempt(parsed, true);
+}
+
+var resolveCommand_1 = resolveCommand;
+
+// See http://www.robvanderwoude.com/escapechars.php
+const metaCharsRegExp = /([()\][%!^"`<>&|;, *?])/g;
+
+function escapeCommand(arg) {
+    // Escape meta chars
+    arg = arg.replace(metaCharsRegExp, '^$1');
+
+    return arg;
+}
+
+function escapeArgument(arg, doubleEscapeMetaChars) {
+    // Convert to string
+    arg = `${arg}`;
+
+    // Algorithm below is based on https://qntm.org/cmd
+
+    // Sequence of backslashes followed by a double quote:
+    // double up all the backslashes and escape the double quote
+    arg = arg.replace(/(\\*)"/g, '$1$1\\"');
+
+    // Sequence of backslashes followed by the end of the string
+    // (which will become a double quote later):
+    // double up all the backslashes
+    arg = arg.replace(/(\\*)$/, '$1$1');
+
+    // All other backslashes occur literally
+
+    // Quote the whole thing:
+    arg = `"${arg}"`;
+
+    // Escape meta chars
+    arg = arg.replace(metaCharsRegExp, '^$1');
+
+    // Double escape meta chars if necessary
+    if (doubleEscapeMetaChars) {
+        arg = arg.replace(metaCharsRegExp, '^$1');
+    }
+
+    return arg;
+}
+
+var command = escapeCommand;
+var argument = escapeArgument;
+
+var _escape = {
+	command: command,
+	argument: argument
+};
+
+var shebangRegex = /^#!.*/;
+
+var shebangCommand = function (str) {
+	var match = str.match(shebangRegex);
+
+	if (!match) {
+		return null;
+	}
+
+	var arr = match[0].replace(/#! ?/, '').split(' ');
+	var bin = arr[0].split('/').pop();
+	var arg = arr[1];
+
+	return (bin === 'env' ?
+		arg :
+		bin + (arg ? ' ' + arg : '')
+	);
+};
+
+function readShebang(command) {
+    // Read the first 150 bytes from the file
+    const size = 150;
+    let buffer;
+
+    if (Buffer.alloc) {
+        // Node.js v4.5+ / v5.10+
+        buffer = Buffer.alloc(size);
+    } else {
+        // Old Node.js API
+        buffer = new Buffer(size);
+        buffer.fill(0); // zero-fill
+    }
+
+    let fd;
+
+    try {
+        fd = fs.openSync(command, 'r');
+        fs.readSync(fd, buffer, 0, size, 0);
+        fs.closeSync(fd);
+    } catch (e) { /* Empty */ }
+
+    // Attempt to extract shebang (null is returned if not a shebang)
+    return shebangCommand(buffer.toString());
+}
+
+var readShebang_1 = readShebang;
+
+var semver = createCommonjsModule(function (module, exports) {
+exports = module.exports = SemVer;
+
+var debug;
+/* istanbul ignore next */
+if (typeof process === 'object' &&
+    process.env &&
+    process.env.NODE_DEBUG &&
+    /\bsemver\b/i.test(process.env.NODE_DEBUG)) {
+  debug = function () {
+    var args = Array.prototype.slice.call(arguments, 0);
+    args.unshift('SEMVER');
+    console.log.apply(console, args);
+  };
+} else {
+  debug = function () {};
+}
+
+// Note: this is the semver.org version of the spec that it implements
+// Not necessarily the package version of this code.
+exports.SEMVER_SPEC_VERSION = '2.0.0';
+
+var MAX_LENGTH = 256;
+var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
+  /* istanbul ignore next */ 9007199254740991;
+
+// Max safe segment length for coercion.
+var MAX_SAFE_COMPONENT_LENGTH = 16;
+
+// The actual regexps go on exports.re
+var re = exports.re = [];
+var src = exports.src = [];
+var R = 0;
+
+// The following Regular Expressions can be used for tokenizing,
+// validating, and parsing SemVer version strings.
+
+// ## Numeric Identifier
+// A single `0`, or a non-zero digit followed by zero or more digits.
+
+var NUMERICIDENTIFIER = R++;
+src[NUMERICIDENTIFIER] = '0|[1-9]\\d*';
+var NUMERICIDENTIFIERLOOSE = R++;
+src[NUMERICIDENTIFIERLOOSE] = '[0-9]+';
+
+// ## Non-numeric Identifier
+// Zero or more digits, followed by a letter or hyphen, and then zero or
+// more letters, digits, or hyphens.
+
+var NONNUMERICIDENTIFIER = R++;
+src[NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-][a-zA-Z0-9-]*';
+
+// ## Main Version
+// Three dot-separated numeric identifiers.
+
+var MAINVERSION = R++;
+src[MAINVERSION] = '(' + src[NUMERICIDENTIFIER] + ')\\.' +
+                   '(' + src[NUMERICIDENTIFIER] + ')\\.' +
+                   '(' + src[NUMERICIDENTIFIER] + ')';
+
+var MAINVERSIONLOOSE = R++;
+src[MAINVERSIONLOOSE] = '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
+                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
+                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')';
+
+// ## Pre-release Version Identifier
+// A numeric identifier, or a non-numeric identifier.
+
+var PRERELEASEIDENTIFIER = R++;
+src[PRERELEASEIDENTIFIER] = '(?:' + src[NUMERICIDENTIFIER] +
+                            '|' + src[NONNUMERICIDENTIFIER] + ')';
+
+var PRERELEASEIDENTIFIERLOOSE = R++;
+src[PRERELEASEIDENTIFIERLOOSE] = '(?:' + src[NUMERICIDENTIFIERLOOSE] +
+                                 '|' + src[NONNUMERICIDENTIFIER] + ')';
+
+// ## Pre-release Version
+// Hyphen, followed by one or more dot-separated pre-release version
+// identifiers.
+
+var PRERELEASE = R++;
+src[PRERELEASE] = '(?:-(' + src[PRERELEASEIDENTIFIER] +
+                  '(?:\\.' + src[PRERELEASEIDENTIFIER] + ')*))';
+
+var PRERELEASELOOSE = R++;
+src[PRERELEASELOOSE] = '(?:-?(' + src[PRERELEASEIDENTIFIERLOOSE] +
+                       '(?:\\.' + src[PRERELEASEIDENTIFIERLOOSE] + ')*))';
+
+// ## Build Metadata Identifier
+// Any combination of digits, letters, or hyphens.
+
+var BUILDIDENTIFIER = R++;
+src[BUILDIDENTIFIER] = '[0-9A-Za-z-]+';
+
+// ## Build Metadata
+// Plus sign, followed by one or more period-separated build metadata
+// identifiers.
+
+var BUILD = R++;
+src[BUILD] = '(?:\\+(' + src[BUILDIDENTIFIER] +
+             '(?:\\.' + src[BUILDIDENTIFIER] + ')*))';
+
+// ## Full Version String
+// A main version, followed optionally by a pre-release version and
+// build metadata.
+
+// Note that the only major, minor, patch, and pre-release sections of
+// the version string are capturing groups.  The build metadata is not a
+// capturing group, because it should not ever be used in version
+// comparison.
+
+var FULL = R++;
+var FULLPLAIN = 'v?' + src[MAINVERSION] +
+                src[PRERELEASE] + '?' +
+                src[BUILD] + '?';
+
+src[FULL] = '^' + FULLPLAIN + '$';
+
+// like full, but allows v1.2.3 and =1.2.3, which people do sometimes.
+// also, 1.0.0alpha1 (prerelease without the hyphen) which is pretty
+// common in the npm registry.
+var LOOSEPLAIN = '[v=\\s]*' + src[MAINVERSIONLOOSE] +
+                 src[PRERELEASELOOSE] + '?' +
+                 src[BUILD] + '?';
+
+var LOOSE = R++;
+src[LOOSE] = '^' + LOOSEPLAIN + '$';
+
+var GTLT = R++;
+src[GTLT] = '((?:<|>)?=?)';
+
+// Something like "2.*" or "1.2.x".
+// Note that "x.x" is a valid xRange identifer, meaning "any version"
+// Only the first item is strictly required.
+var XRANGEIDENTIFIERLOOSE = R++;
+src[XRANGEIDENTIFIERLOOSE] = src[NUMERICIDENTIFIERLOOSE] + '|x|X|\\*';
+var XRANGEIDENTIFIER = R++;
+src[XRANGEIDENTIFIER] = src[NUMERICIDENTIFIER] + '|x|X|\\*';
+
+var XRANGEPLAIN = R++;
+src[XRANGEPLAIN] = '[v=\\s]*(' + src[XRANGEIDENTIFIER] + ')' +
+                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
+                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
+                   '(?:' + src[PRERELEASE] + ')?' +
+                   src[BUILD] + '?' +
+                   ')?)?';
+
+var XRANGEPLAINLOOSE = R++;
+src[XRANGEPLAINLOOSE] = '[v=\\s]*(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
+                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
+                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
+                        '(?:' + src[PRERELEASELOOSE] + ')?' +
+                        src[BUILD] + '?' +
+                        ')?)?';
+
+var XRANGE = R++;
+src[XRANGE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAIN] + '$';
+var XRANGELOOSE = R++;
+src[XRANGELOOSE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAINLOOSE] + '$';
+
+// Coercion.
+// Extract anything that could conceivably be a part of a valid semver
+var COERCE = R++;
+src[COERCE] = '(?:^|[^\\d])' +
+              '(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '})' +
+              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
+              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
+              '(?:$|[^\\d])';
+
+// Tilde ranges.
+// Meaning is "reasonably at or greater than"
+var LONETILDE = R++;
+src[LONETILDE] = '(?:~>?)';
+
+var TILDETRIM = R++;
+src[TILDETRIM] = '(\\s*)' + src[LONETILDE] + '\\s+';
+re[TILDETRIM] = new RegExp(src[TILDETRIM], 'g');
+var tildeTrimReplace = '$1~';
+
+var TILDE = R++;
+src[TILDE] = '^' + src[LONETILDE] + src[XRANGEPLAIN] + '$';
+var TILDELOOSE = R++;
+src[TILDELOOSE] = '^' + src[LONETILDE] + src[XRANGEPLAINLOOSE] + '$';
+
+// Caret ranges.
+// Meaning is "at least and backwards compatible with"
+var LONECARET = R++;
+src[LONECARET] = '(?:\\^)';
+
+var CARETTRIM = R++;
+src[CARETTRIM] = '(\\s*)' + src[LONECARET] + '\\s+';
+re[CARETTRIM] = new RegExp(src[CARETTRIM], 'g');
+var caretTrimReplace = '$1^';
+
+var CARET = R++;
+src[CARET] = '^' + src[LONECARET] + src[XRANGEPLAIN] + '$';
+var CARETLOOSE = R++;
+src[CARETLOOSE] = '^' + src[LONECARET] + src[XRANGEPLAINLOOSE] + '$';
+
+// A simple gt/lt/eq thing, or just "" to indicate "any version"
+var COMPARATORLOOSE = R++;
+src[COMPARATORLOOSE] = '^' + src[GTLT] + '\\s*(' + LOOSEPLAIN + ')$|^$';
+var COMPARATOR = R++;
+src[COMPARATOR] = '^' + src[GTLT] + '\\s*(' + FULLPLAIN + ')$|^$';
+
+// An expression to strip any whitespace between the gtlt and the thing
+// it modifies, so that `> 1.2.3` ==> `>1.2.3`
+var COMPARATORTRIM = R++;
+src[COMPARATORTRIM] = '(\\s*)' + src[GTLT] +
+                      '\\s*(' + LOOSEPLAIN + '|' + src[XRANGEPLAIN] + ')';
+
+// this one has to use the /g flag
+re[COMPARATORTRIM] = new RegExp(src[COMPARATORTRIM], 'g');
+var comparatorTrimReplace = '$1$2$3';
+
+// Something like `1.2.3 - 1.2.4`
+// Note that these all use the loose form, because they'll be
+// checked against either the strict or loose comparator form
+// later.
+var HYPHENRANGE = R++;
+src[HYPHENRANGE] = '^\\s*(' + src[XRANGEPLAIN] + ')' +
+                   '\\s+-\\s+' +
+                   '(' + src[XRANGEPLAIN] + ')' +
+                   '\\s*$';
+
+var HYPHENRANGELOOSE = R++;
+src[HYPHENRANGELOOSE] = '^\\s*(' + src[XRANGEPLAINLOOSE] + ')' +
+                        '\\s+-\\s+' +
+                        '(' + src[XRANGEPLAINLOOSE] + ')' +
+                        '\\s*$';
+
+// Star ranges basically just allow anything at all.
+var STAR = R++;
+src[STAR] = '(<|>)?=?\\s*\\*';
+
+// Compile to actual regexp objects.
+// All are flag-free, unless they were created above with a flag.
+for (var i = 0; i < R; i++) {
+  debug(i, src[i]);
+  if (!re[i]) {
+    re[i] = new RegExp(src[i]);
+  }
+}
+
+exports.parse = parse;
+function parse (version, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    };
+  }
+
+  if (version instanceof SemVer) {
+    return version
+  }
+
+  if (typeof version !== 'string') {
+    return null
+  }
+
+  if (version.length > MAX_LENGTH) {
+    return null
+  }
+
+  var r = options.loose ? re[LOOSE] : re[FULL];
+  if (!r.test(version)) {
+    return null
+  }
+
+  try {
+    return new SemVer(version, options)
+  } catch (er) {
+    return null
+  }
+}
+
+exports.valid = valid;
+function valid (version, options) {
+  var v = parse(version, options);
+  return v ? v.version : null
+}
+
+exports.clean = clean;
+function clean (version, options) {
+  var s = parse(version.trim().replace(/^[=v]+/, ''), options);
+  return s ? s.version : null
+}
+
+exports.SemVer = SemVer;
+
+function SemVer (version, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    };
+  }
+  if (version instanceof SemVer) {
+    if (version.loose === options.loose) {
+      return version
+    } else {
+      version = version.version;
+    }
+  } else if (typeof version !== 'string') {
+    throw new TypeError('Invalid Version: ' + version)
+  }
+
+  if (version.length > MAX_LENGTH) {
+    throw new TypeError('version is longer than ' + MAX_LENGTH + ' characters')
+  }
+
+  if (!(this instanceof SemVer)) {
+    return new SemVer(version, options)
+  }
+
+  debug('SemVer', version, options);
+  this.options = options;
+  this.loose = !!options.loose;
+
+  var m = version.trim().match(options.loose ? re[LOOSE] : re[FULL]);
+
+  if (!m) {
+    throw new TypeError('Invalid Version: ' + version)
+  }
+
+  this.raw = version;
+
+  // these are actually numbers
+  this.major = +m[1];
+  this.minor = +m[2];
+  this.patch = +m[3];
+
+  if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
+    throw new TypeError('Invalid major version')
+  }
+
+  if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
+    throw new TypeError('Invalid minor version')
+  }
+
+  if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
+    throw new TypeError('Invalid patch version')
+  }
+
+  // numberify any prerelease numeric ids
+  if (!m[4]) {
+    this.prerelease = [];
+  } else {
+    this.prerelease = m[4].split('.').map(function (id) {
+      if (/^[0-9]+$/.test(id)) {
+        var num = +id;
+        if (num >= 0 && num < MAX_SAFE_INTEGER) {
+          return num
+        }
+      }
+      return id
+    });
+  }
+
+  this.build = m[5] ? m[5].split('.') : [];
+  this.format();
+}
+
+SemVer.prototype.format = function () {
+  this.version = this.major + '.' + this.minor + '.' + this.patch;
+  if (this.prerelease.length) {
+    this.version += '-' + this.prerelease.join('.');
+  }
+  return this.version
+};
+
+SemVer.prototype.toString = function () {
+  return this.version
+};
+
+SemVer.prototype.compare = function (other) {
+  debug('SemVer.compare', this.version, this.options, other);
+  if (!(other instanceof SemVer)) {
+    other = new SemVer(other, this.options);
+  }
+
+  return this.compareMain(other) || this.comparePre(other)
+};
+
+SemVer.prototype.compareMain = function (other) {
+  if (!(other instanceof SemVer)) {
+    other = new SemVer(other, this.options);
+  }
+
+  return compareIdentifiers(this.major, other.major) ||
+         compareIdentifiers(this.minor, other.minor) ||
+         compareIdentifiers(this.patch, other.patch)
+};
+
+SemVer.prototype.comparePre = function (other) {
+  if (!(other instanceof SemVer)) {
+    other = new SemVer(other, this.options);
+  }
+
+  // NOT having a prerelease is > having one
+  if (this.prerelease.length && !other.prerelease.length) {
+    return -1
+  } else if (!this.prerelease.length && other.prerelease.length) {
+    return 1
+  } else if (!this.prerelease.length && !other.prerelease.length) {
+    return 0
+  }
+
+  var i = 0;
+  do {
+    var a = this.prerelease[i];
+    var b = other.prerelease[i];
+    debug('prerelease compare', i, a, b);
+    if (a === undefined && b === undefined) {
+      return 0
+    } else if (b === undefined) {
+      return 1
+    } else if (a === undefined) {
+      return -1
+    } else if (a === b) {
+      continue
+    } else {
+      return compareIdentifiers(a, b)
+    }
+  } while (++i)
+};
+
+// preminor will bump the version up to the next minor release, and immediately
+// down to pre-release. premajor and prepatch work the same way.
+SemVer.prototype.inc = function (release, identifier) {
+  switch (release) {
+    case 'premajor':
+      this.prerelease.length = 0;
+      this.patch = 0;
+      this.minor = 0;
+      this.major++;
+      this.inc('pre', identifier);
+      break
+    case 'preminor':
+      this.prerelease.length = 0;
+      this.patch = 0;
+      this.minor++;
+      this.inc('pre', identifier);
+      break
+    case 'prepatch':
+      // If this is already a prerelease, it will bump to the next version
+      // drop any prereleases that might already exist, since they are not
+      // relevant at this point.
+      this.prerelease.length = 0;
+      this.inc('patch', identifier);
+      this.inc('pre', identifier);
+      break
+    // If the input is a non-prerelease version, this acts the same as
+    // prepatch.
+    case 'prerelease':
+      if (this.prerelease.length === 0) {
+        this.inc('patch', identifier);
+      }
+      this.inc('pre', identifier);
+      break
+
+    case 'major':
+      // If this is a pre-major version, bump up to the same major version.
+      // Otherwise increment major.
+      // 1.0.0-5 bumps to 1.0.0
+      // 1.1.0 bumps to 2.0.0
+      if (this.minor !== 0 ||
+          this.patch !== 0 ||
+          this.prerelease.length === 0) {
+        this.major++;
+      }
+      this.minor = 0;
+      this.patch = 0;
+      this.prerelease = [];
+      break
+    case 'minor':
+      // If this is a pre-minor version, bump up to the same minor version.
+      // Otherwise increment minor.
+      // 1.2.0-5 bumps to 1.2.0
+      // 1.2.1 bumps to 1.3.0
+      if (this.patch !== 0 || this.prerelease.length === 0) {
+        this.minor++;
+      }
+      this.patch = 0;
+      this.prerelease = [];
+      break
+    case 'patch':
+      // If this is not a pre-release version, it will increment the patch.
+      // If it is a pre-release it will bump up to the same patch version.
+      // 1.2.0-5 patches to 1.2.0
+      // 1.2.0 patches to 1.2.1
+      if (this.prerelease.length === 0) {
+        this.patch++;
+      }
+      this.prerelease = [];
+      break
+    // This probably shouldn't be used publicly.
+    // 1.0.0 "pre" would become 1.0.0-0 which is the wrong direction.
+    case 'pre':
+      if (this.prerelease.length === 0) {
+        this.prerelease = [0];
+      } else {
+        var i = this.prerelease.length;
+        while (--i >= 0) {
+          if (typeof this.prerelease[i] === 'number') {
+            this.prerelease[i]++;
+            i = -2;
+          }
+        }
+        if (i === -1) {
+          // didn't increment anything
+          this.prerelease.push(0);
+        }
+      }
+      if (identifier) {
+        // 1.2.0-beta.1 bumps to 1.2.0-beta.2,
+        // 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
+        if (this.prerelease[0] === identifier) {
+          if (isNaN(this.prerelease[1])) {
+            this.prerelease = [identifier, 0];
+          }
+        } else {
+          this.prerelease = [identifier, 0];
+        }
+      }
+      break
+
+    default:
+      throw new Error('invalid increment argument: ' + release)
+  }
+  this.format();
+  this.raw = this.version;
+  return this
+};
+
+exports.inc = inc;
+function inc (version, release, loose, identifier) {
+  if (typeof (loose) === 'string') {
+    identifier = loose;
+    loose = undefined;
+  }
+
+  try {
+    return new SemVer(version, loose).inc(release, identifier).version
+  } catch (er) {
+    return null
+  }
+}
+
+exports.diff = diff;
+function diff (version1, version2) {
+  if (eq(version1, version2)) {
+    return null
+  } else {
+    var v1 = parse(version1);
+    var v2 = parse(version2);
+    var prefix = '';
+    if (v1.prerelease.length || v2.prerelease.length) {
+      prefix = 'pre';
+      var defaultResult = 'prerelease';
+    }
+    for (var key in v1) {
+      if (key === 'major' || key === 'minor' || key === 'patch') {
+        if (v1[key] !== v2[key]) {
+          return prefix + key
+        }
+      }
+    }
+    return defaultResult // may be undefined
+  }
+}
+
+exports.compareIdentifiers = compareIdentifiers;
+
+var numeric = /^[0-9]+$/;
+function compareIdentifiers (a, b) {
+  var anum = numeric.test(a);
+  var bnum = numeric.test(b);
+
+  if (anum && bnum) {
+    a = +a;
+    b = +b;
+  }
+
+  return a === b ? 0
+    : (anum && !bnum) ? -1
+    : (bnum && !anum) ? 1
+    : a < b ? -1
+    : 1
+}
+
+exports.rcompareIdentifiers = rcompareIdentifiers;
+function rcompareIdentifiers (a, b) {
+  return compareIdentifiers(b, a)
+}
+
+exports.major = major;
+function major (a, loose) {
+  return new SemVer(a, loose).major
+}
+
+exports.minor = minor;
+function minor (a, loose) {
+  return new SemVer(a, loose).minor
+}
+
+exports.patch = patch;
+function patch (a, loose) {
+  return new SemVer(a, loose).patch
+}
+
+exports.compare = compare;
+function compare (a, b, loose) {
+  return new SemVer(a, loose).compare(new SemVer(b, loose))
+}
+
+exports.compareLoose = compareLoose;
+function compareLoose (a, b) {
+  return compare(a, b, true)
+}
+
+exports.rcompare = rcompare;
+function rcompare (a, b, loose) {
+  return compare(b, a, loose)
+}
+
+exports.sort = sort;
+function sort (list, loose) {
+  return list.sort(function (a, b) {
+    return exports.compare(a, b, loose)
+  })
+}
+
+exports.rsort = rsort;
+function rsort (list, loose) {
+  return list.sort(function (a, b) {
+    return exports.rcompare(a, b, loose)
+  })
+}
+
+exports.gt = gt;
+function gt (a, b, loose) {
+  return compare(a, b, loose) > 0
+}
+
+exports.lt = lt;
+function lt (a, b, loose) {
+  return compare(a, b, loose) < 0
+}
+
+exports.eq = eq;
+function eq (a, b, loose) {
+  return compare(a, b, loose) === 0
+}
+
+exports.neq = neq;
+function neq (a, b, loose) {
+  return compare(a, b, loose) !== 0
+}
+
+exports.gte = gte;
+function gte (a, b, loose) {
+  return compare(a, b, loose) >= 0
+}
+
+exports.lte = lte;
+function lte (a, b, loose) {
+  return compare(a, b, loose) <= 0
+}
+
+exports.cmp = cmp;
+function cmp (a, op, b, loose) {
+  switch (op) {
+    case '===':
+      if (typeof a === 'object')
+        a = a.version;
+      if (typeof b === 'object')
+        b = b.version;
+      return a === b
+
+    case '!==':
+      if (typeof a === 'object')
+        a = a.version;
+      if (typeof b === 'object')
+        b = b.version;
+      return a !== b
+
+    case '':
+    case '=':
+    case '==':
+      return eq(a, b, loose)
+
+    case '!=':
+      return neq(a, b, loose)
+
+    case '>':
+      return gt(a, b, loose)
+
+    case '>=':
+      return gte(a, b, loose)
+
+    case '<':
+      return lt(a, b, loose)
+
+    case '<=':
+      return lte(a, b, loose)
+
+    default:
+      throw new TypeError('Invalid operator: ' + op)
+  }
+}
+
+exports.Comparator = Comparator;
+function Comparator (comp, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    };
+  }
+
+  if (comp instanceof Comparator) {
+    if (comp.loose === !!options.loose) {
+      return comp
+    } else {
+      comp = comp.value;
+    }
+  }
+
+  if (!(this instanceof Comparator)) {
+    return new Comparator(comp, options)
+  }
+
+  debug('comparator', comp, options);
+  this.options = options;
+  this.loose = !!options.loose;
+  this.parse(comp);
+
+  if (this.semver === ANY) {
+    this.value = '';
+  } else {
+    this.value = this.operator + this.semver.version;
+  }
+
+  debug('comp', this);
+}
+
+var ANY = {};
+Comparator.prototype.parse = function (comp) {
+  var r = this.options.loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
+  var m = comp.match(r);
+
+  if (!m) {
+    throw new TypeError('Invalid comparator: ' + comp)
+  }
+
+  this.operator = m[1];
+  if (this.operator === '=') {
+    this.operator = '';
+  }
+
+  // if it literally is just '>' or '' then allow anything.
+  if (!m[2]) {
+    this.semver = ANY;
+  } else {
+    this.semver = new SemVer(m[2], this.options.loose);
+  }
+};
+
+Comparator.prototype.toString = function () {
+  return this.value
+};
+
+Comparator.prototype.test = function (version) {
+  debug('Comparator.test', version, this.options.loose);
+
+  if (this.semver === ANY) {
+    return true
+  }
+
+  if (typeof version === 'string') {
+    version = new SemVer(version, this.options);
+  }
+
+  return cmp(version, this.operator, this.semver, this.options)
+};
+
+Comparator.prototype.intersects = function (comp, options) {
+  if (!(comp instanceof Comparator)) {
+    throw new TypeError('a Comparator is required')
+  }
+
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    };
+  }
+
+  var rangeTmp;
+
+  if (this.operator === '') {
+    rangeTmp = new Range(comp.value, options);
+    return satisfies(this.value, rangeTmp, options)
+  } else if (comp.operator === '') {
+    rangeTmp = new Range(this.value, options);
+    return satisfies(comp.semver, rangeTmp, options)
+  }
+
+  var sameDirectionIncreasing =
+    (this.operator === '>=' || this.operator === '>') &&
+    (comp.operator === '>=' || comp.operator === '>');
+  var sameDirectionDecreasing =
+    (this.operator === '<=' || this.operator === '<') &&
+    (comp.operator === '<=' || comp.operator === '<');
+  var sameSemVer = this.semver.version === comp.semver.version;
+  var differentDirectionsInclusive =
+    (this.operator === '>=' || this.operator === '<=') &&
+    (comp.operator === '>=' || comp.operator === '<=');
+  var oppositeDirectionsLessThan =
+    cmp(this.semver, '<', comp.semver, options) &&
+    ((this.operator === '>=' || this.operator === '>') &&
+    (comp.operator === '<=' || comp.operator === '<'));
+  var oppositeDirectionsGreaterThan =
+    cmp(this.semver, '>', comp.semver, options) &&
+    ((this.operator === '<=' || this.operator === '<') &&
+    (comp.operator === '>=' || comp.operator === '>'));
+
+  return sameDirectionIncreasing || sameDirectionDecreasing ||
+    (sameSemVer && differentDirectionsInclusive) ||
+    oppositeDirectionsLessThan || oppositeDirectionsGreaterThan
+};
+
+exports.Range = Range;
+function Range (range, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    };
+  }
+
+  if (range instanceof Range) {
+    if (range.loose === !!options.loose &&
+        range.includePrerelease === !!options.includePrerelease) {
+      return range
+    } else {
+      return new Range(range.raw, options)
+    }
+  }
+
+  if (range instanceof Comparator) {
+    return new Range(range.value, options)
+  }
+
+  if (!(this instanceof Range)) {
+    return new Range(range, options)
+  }
+
+  this.options = options;
+  this.loose = !!options.loose;
+  this.includePrerelease = !!options.includePrerelease;
+
+  // First, split based on boolean or ||
+  this.raw = range;
+  this.set = range.split(/\s*\|\|\s*/).map(function (range) {
+    return this.parseRange(range.trim())
+  }, this).filter(function (c) {
+    // throw out any that are not relevant for whatever reason
+    return c.length
+  });
+
+  if (!this.set.length) {
+    throw new TypeError('Invalid SemVer Range: ' + range)
+  }
+
+  this.format();
+}
+
+Range.prototype.format = function () {
+  this.range = this.set.map(function (comps) {
+    return comps.join(' ').trim()
+  }).join('||').trim();
+  return this.range
+};
+
+Range.prototype.toString = function () {
+  return this.range
+};
+
+Range.prototype.parseRange = function (range) {
+  var loose = this.options.loose;
+  range = range.trim();
+  // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
+  var hr = loose ? re[HYPHENRANGELOOSE] : re[HYPHENRANGE];
+  range = range.replace(hr, hyphenReplace);
+  debug('hyphen replace', range);
+  // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
+  range = range.replace(re[COMPARATORTRIM], comparatorTrimReplace);
+  debug('comparator trim', range, re[COMPARATORTRIM]);
+
+  // `~ 1.2.3` => `~1.2.3`
+  range = range.replace(re[TILDETRIM], tildeTrimReplace);
+
+  // `^ 1.2.3` => `^1.2.3`
+  range = range.replace(re[CARETTRIM], caretTrimReplace);
+
+  // normalize spaces
+  range = range.split(/\s+/).join(' ');
+
+  // At this point, the range is completely trimmed and
+  // ready to be split into comparators.
+
+  var compRe = loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
+  var set = range.split(' ').map(function (comp) {
+    return parseComparator(comp, this.options)
+  }, this).join(' ').split(/\s+/);
+  if (this.options.loose) {
+    // in loose mode, throw out any that are not valid comparators
+    set = set.filter(function (comp) {
+      return !!comp.match(compRe)
+    });
+  }
+  set = set.map(function (comp) {
+    return new Comparator(comp, this.options)
+  }, this);
+
+  return set
+};
+
+Range.prototype.intersects = function (range, options) {
+  if (!(range instanceof Range)) {
+    throw new TypeError('a Range is required')
+  }
+
+  return this.set.some(function (thisComparators) {
+    return thisComparators.every(function (thisComparator) {
+      return range.set.some(function (rangeComparators) {
+        return rangeComparators.every(function (rangeComparator) {
+          return thisComparator.intersects(rangeComparator, options)
+        })
+      })
+    })
+  })
+};
+
+// Mostly just for testing and legacy API reasons
+exports.toComparators = toComparators;
+function toComparators (range, options) {
+  return new Range(range, options).set.map(function (comp) {
+    return comp.map(function (c) {
+      return c.value
+    }).join(' ').trim().split(' ')
+  })
+}
+
+// comprised of xranges, tildes, stars, and gtlt's at this point.
+// already replaced the hyphen ranges
+// turn into a set of JUST comparators.
+function parseComparator (comp, options) {
+  debug('comp', comp, options);
+  comp = replaceCarets(comp, options);
+  debug('caret', comp);
+  comp = replaceTildes(comp, options);
+  debug('tildes', comp);
+  comp = replaceXRanges(comp, options);
+  debug('xrange', comp);
+  comp = replaceStars(comp, options);
+  debug('stars', comp);
+  return comp
+}
+
+function isX (id) {
+  return !id || id.toLowerCase() === 'x' || id === '*'
+}
+
+// ~, ~> --> * (any, kinda silly)
+// ~2, ~2.x, ~2.x.x, ~>2, ~>2.x ~>2.x.x --> >=2.0.0 <3.0.0
+// ~2.0, ~2.0.x, ~>2.0, ~>2.0.x --> >=2.0.0 <2.1.0
+// ~1.2, ~1.2.x, ~>1.2, ~>1.2.x --> >=1.2.0 <1.3.0
+// ~1.2.3, ~>1.2.3 --> >=1.2.3 <1.3.0
+// ~1.2.0, ~>1.2.0 --> >=1.2.0 <1.3.0
+function replaceTildes (comp, options) {
+  return comp.trim().split(/\s+/).map(function (comp) {
+    return replaceTilde(comp, options)
+  }).join(' ')
+}
+
+function replaceTilde (comp, options) {
+  var r = options.loose ? re[TILDELOOSE] : re[TILDE];
+  return comp.replace(r, function (_, M, m, p, pr) {
+    debug('tilde', comp, _, M, m, p, pr);
+    var ret;
+
+    if (isX(M)) {
+      ret = '';
+    } else if (isX(m)) {
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
+    } else if (isX(p)) {
+      // ~1.2 == >=1.2.0 <1.3.0
+      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
+    } else if (pr) {
+      debug('replaceTilde pr', pr);
+      ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+            ' <' + M + '.' + (+m + 1) + '.0';
+    } else {
+      // ~1.2.3 == >=1.2.3 <1.3.0
+      ret = '>=' + M + '.' + m + '.' + p +
+            ' <' + M + '.' + (+m + 1) + '.0';
+    }
+
+    debug('tilde return', ret);
+    return ret
+  })
+}
+
+// ^ --> * (any, kinda silly)
+// ^2, ^2.x, ^2.x.x --> >=2.0.0 <3.0.0
+// ^2.0, ^2.0.x --> >=2.0.0 <3.0.0
+// ^1.2, ^1.2.x --> >=1.2.0 <2.0.0
+// ^1.2.3 --> >=1.2.3 <2.0.0
+// ^1.2.0 --> >=1.2.0 <2.0.0
+function replaceCarets (comp, options) {
+  return comp.trim().split(/\s+/).map(function (comp) {
+    return replaceCaret(comp, options)
+  }).join(' ')
+}
+
+function replaceCaret (comp, options) {
+  debug('caret', comp, options);
+  var r = options.loose ? re[CARETLOOSE] : re[CARET];
+  return comp.replace(r, function (_, M, m, p, pr) {
+    debug('caret', comp, _, M, m, p, pr);
+    var ret;
+
+    if (isX(M)) {
+      ret = '';
+    } else if (isX(m)) {
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
+    } else if (isX(p)) {
+      if (M === '0') {
+        ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
+      } else {
+        ret = '>=' + M + '.' + m + '.0 <' + (+M + 1) + '.0.0';
+      }
+    } else if (pr) {
+      debug('replaceCaret pr', pr);
+      if (M === '0') {
+        if (m === '0') {
+          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+                ' <' + M + '.' + m + '.' + (+p + 1);
+        } else {
+          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+                ' <' + M + '.' + (+m + 1) + '.0';
+        }
+      } else {
+        ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+              ' <' + (+M + 1) + '.0.0';
+      }
+    } else {
+      debug('no pr');
+      if (M === '0') {
+        if (m === '0') {
+          ret = '>=' + M + '.' + m + '.' + p +
+                ' <' + M + '.' + m + '.' + (+p + 1);
+        } else {
+          ret = '>=' + M + '.' + m + '.' + p +
+                ' <' + M + '.' + (+m + 1) + '.0';
+        }
+      } else {
+        ret = '>=' + M + '.' + m + '.' + p +
+              ' <' + (+M + 1) + '.0.0';
+      }
+    }
+
+    debug('caret return', ret);
+    return ret
+  })
+}
+
+function replaceXRanges (comp, options) {
+  debug('replaceXRanges', comp, options);
+  return comp.split(/\s+/).map(function (comp) {
+    return replaceXRange(comp, options)
+  }).join(' ')
+}
+
+function replaceXRange (comp, options) {
+  comp = comp.trim();
+  var r = options.loose ? re[XRANGELOOSE] : re[XRANGE];
+  return comp.replace(r, function (ret, gtlt, M, m, p, pr) {
+    debug('xRange', comp, ret, gtlt, M, m, p, pr);
+    var xM = isX(M);
+    var xm = xM || isX(m);
+    var xp = xm || isX(p);
+    var anyX = xp;
+
+    if (gtlt === '=' && anyX) {
+      gtlt = '';
+    }
+
+    if (xM) {
+      if (gtlt === '>' || gtlt === '<') {
+        // nothing is allowed
+        ret = '<0.0.0';
+      } else {
+        // nothing is forbidden
+        ret = '*';
+      }
+    } else if (gtlt && anyX) {
+      // we know patch is an x, because we have any x at all.
+      // replace X with 0
+      if (xm) {
+        m = 0;
+      }
+      p = 0;
+
+      if (gtlt === '>') {
+        // >1 => >=2.0.0
+        // >1.2 => >=1.3.0
+        // >1.2.3 => >= 1.2.4
+        gtlt = '>=';
+        if (xm) {
+          M = +M + 1;
+          m = 0;
+          p = 0;
+        } else {
+          m = +m + 1;
+          p = 0;
+        }
+      } else if (gtlt === '<=') {
+        // <=0.7.x is actually <0.8.0, since any 0.7.x should
+        // pass.  Similarly, <=7.x is actually <8.0.0, etc.
+        gtlt = '<';
+        if (xm) {
+          M = +M + 1;
+        } else {
+          m = +m + 1;
+        }
+      }
+
+      ret = gtlt + M + '.' + m + '.' + p;
+    } else if (xm) {
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
+    } else if (xp) {
+      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
+    }
+
+    debug('xRange return', ret);
+
+    return ret
+  })
+}
+
+// Because * is AND-ed with everything else in the comparator,
+// and '' means "any version", just remove the *s entirely.
+function replaceStars (comp, options) {
+  debug('replaceStars', comp, options);
+  // Looseness is ignored here.  star is always as loose as it gets!
+  return comp.trim().replace(re[STAR], '')
+}
+
+// This function is passed to string.replace(re[HYPHENRANGE])
+// M, m, patch, prerelease, build
+// 1.2 - 3.4.5 => >=1.2.0 <=3.4.5
+// 1.2.3 - 3.4 => >=1.2.0 <3.5.0 Any 3.4.x will do
+// 1.2 - 3.4 => >=1.2.0 <3.5.0
+function hyphenReplace ($0,
+  from, fM, fm, fp, fpr, fb,
+  to, tM, tm, tp, tpr, tb) {
+  if (isX(fM)) {
+    from = '';
+  } else if (isX(fm)) {
+    from = '>=' + fM + '.0.0';
+  } else if (isX(fp)) {
+    from = '>=' + fM + '.' + fm + '.0';
+  } else {
+    from = '>=' + from;
+  }
+
+  if (isX(tM)) {
+    to = '';
+  } else if (isX(tm)) {
+    to = '<' + (+tM + 1) + '.0.0';
+  } else if (isX(tp)) {
+    to = '<' + tM + '.' + (+tm + 1) + '.0';
+  } else if (tpr) {
+    to = '<=' + tM + '.' + tm + '.' + tp + '-' + tpr;
+  } else {
+    to = '<=' + to;
+  }
+
+  return (from + ' ' + to).trim()
+}
+
+// if ANY of the sets match ALL of its comparators, then pass
+Range.prototype.test = function (version) {
+  if (!version) {
+    return false
+  }
+
+  if (typeof version === 'string') {
+    version = new SemVer(version, this.options);
+  }
+
+  for (var i = 0; i < this.set.length; i++) {
+    if (testSet(this.set[i], version, this.options)) {
+      return true
+    }
+  }
+  return false
+};
+
+function testSet (set, version, options) {
+  for (var i = 0; i < set.length; i++) {
+    if (!set[i].test(version)) {
+      return false
+    }
+  }
+
+  if (version.prerelease.length && !options.includePrerelease) {
+    // Find the set of versions that are allowed to have prereleases
+    // For example, ^1.2.3-pr.1 desugars to >=1.2.3-pr.1 <2.0.0
+    // That should allow `1.2.3-pr.2` to pass.
+    // However, `1.2.4-alpha.notready` should NOT be allowed,
+    // even though it's within the range set by the comparators.
+    for (i = 0; i < set.length; i++) {
+      debug(set[i].semver);
+      if (set[i].semver === ANY) {
+        continue
+      }
+
+      if (set[i].semver.prerelease.length > 0) {
+        var allowed = set[i].semver;
+        if (allowed.major === version.major &&
+            allowed.minor === version.minor &&
+            allowed.patch === version.patch) {
+          return true
+        }
+      }
+    }
+
+    // Version has a -pre, but it's not one of the ones we like.
+    return false
+  }
+
+  return true
+}
+
+exports.satisfies = satisfies;
+function satisfies (version, range, options) {
+  try {
+    range = new Range(range, options);
+  } catch (er) {
+    return false
+  }
+  return range.test(version)
+}
+
+exports.maxSatisfying = maxSatisfying;
+function maxSatisfying (versions, range, options) {
+  var max = null;
+  var maxSV = null;
+  try {
+    var rangeObj = new Range(range, options);
+  } catch (er) {
+    return null
+  }
+  versions.forEach(function (v) {
+    if (rangeObj.test(v)) {
+      // satisfies(v, range, options)
+      if (!max || maxSV.compare(v) === -1) {
+        // compare(max, v, true)
+        max = v;
+        maxSV = new SemVer(max, options);
+      }
+    }
+  });
+  return max
+}
+
+exports.minSatisfying = minSatisfying;
+function minSatisfying (versions, range, options) {
+  var min = null;
+  var minSV = null;
+  try {
+    var rangeObj = new Range(range, options);
+  } catch (er) {
+    return null
+  }
+  versions.forEach(function (v) {
+    if (rangeObj.test(v)) {
+      // satisfies(v, range, options)
+      if (!min || minSV.compare(v) === 1) {
+        // compare(min, v, true)
+        min = v;
+        minSV = new SemVer(min, options);
+      }
+    }
+  });
+  return min
+}
+
+exports.minVersion = minVersion;
+function minVersion (range, loose) {
+  range = new Range(range, loose);
+
+  var minver = new SemVer('0.0.0');
+  if (range.test(minver)) {
+    return minver
+  }
+
+  minver = new SemVer('0.0.0-0');
+  if (range.test(minver)) {
+    return minver
+  }
+
+  minver = null;
+  for (var i = 0; i < range.set.length; ++i) {
+    var comparators = range.set[i];
+
+    comparators.forEach(function (comparator) {
+      // Clone to avoid manipulating the comparator's semver object.
+      var compver = new SemVer(comparator.semver.version);
+      switch (comparator.operator) {
+        case '>':
+          if (compver.prerelease.length === 0) {
+            compver.patch++;
+          } else {
+            compver.prerelease.push(0);
+          }
+          compver.raw = compver.format();
+          /* fallthrough */
+        case '':
+        case '>=':
+          if (!minver || gt(minver, compver)) {
+            minver = compver;
+          }
+          break
+        case '<':
+        case '<=':
+          /* Ignore maximum versions */
+          break
+        /* istanbul ignore next */
+        default:
+          throw new Error('Unexpected operation: ' + comparator.operator)
+      }
+    });
+  }
+
+  if (minver && range.test(minver)) {
+    return minver
+  }
+
+  return null
+}
+
+exports.validRange = validRange;
+function validRange (range, options) {
+  try {
+    // Return '*' instead of '' so that truthiness works.
+    // This will throw if it's invalid anyway
+    return new Range(range, options).range || '*'
+  } catch (er) {
+    return null
+  }
+}
+
+// Determine if version is less than all the versions possible in the range
+exports.ltr = ltr;
+function ltr (version, range, options) {
+  return outside(version, range, '<', options)
+}
+
+// Determine if version is greater than all the versions possible in the range.
+exports.gtr = gtr;
+function gtr (version, range, options) {
+  return outside(version, range, '>', options)
+}
+
+exports.outside = outside;
+function outside (version, range, hilo, options) {
+  version = new SemVer(version, options);
+  range = new Range(range, options);
+
+  var gtfn, ltefn, ltfn, comp, ecomp;
+  switch (hilo) {
+    case '>':
+      gtfn = gt;
+      ltefn = lte;
+      ltfn = lt;
+      comp = '>';
+      ecomp = '>=';
+      break
+    case '<':
+      gtfn = lt;
+      ltefn = gte;
+      ltfn = gt;
+      comp = '<';
+      ecomp = '<=';
+      break
+    default:
+      throw new TypeError('Must provide a hilo val of "<" or ">"')
+  }
+
+  // If it satisifes the range it is not outside
+  if (satisfies(version, range, options)) {
+    return false
+  }
+
+  // From now on, variable terms are as if we're in "gtr" mode.
+  // but note that everything is flipped for the "ltr" function.
+
+  for (var i = 0; i < range.set.length; ++i) {
+    var comparators = range.set[i];
+
+    var high = null;
+    var low = null;
+
+    comparators.forEach(function (comparator) {
+      if (comparator.semver === ANY) {
+        comparator = new Comparator('>=0.0.0');
+      }
+      high = high || comparator;
+      low = low || comparator;
+      if (gtfn(comparator.semver, high.semver, options)) {
+        high = comparator;
+      } else if (ltfn(comparator.semver, low.semver, options)) {
+        low = comparator;
+      }
+    });
+
+    // If the edge version comparator has a operator then our version
+    // isn't outside it
+    if (high.operator === comp || high.operator === ecomp) {
+      return false
+    }
+
+    // If the lowest version comparator has an operator and our version
+    // is less than it then it isn't higher than the range
+    if ((!low.operator || low.operator === comp) &&
+        ltefn(version, low.semver)) {
+      return false
+    } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+      return false
+    }
+  }
+  return true
+}
+
+exports.prerelease = prerelease;
+function prerelease (version, options) {
+  var parsed = parse(version, options);
+  return (parsed && parsed.prerelease.length) ? parsed.prerelease : null
+}
+
+exports.intersects = intersects;
+function intersects (r1, r2, options) {
+  r1 = new Range(r1, options);
+  r2 = new Range(r2, options);
+  return r1.intersects(r2)
+}
+
+exports.coerce = coerce;
+function coerce (version) {
+  if (version instanceof SemVer) {
+    return version
+  }
+
+  if (typeof version !== 'string') {
+    return null
+  }
+
+  var match = version.match(re[COERCE]);
+
+  if (match == null) {
+    return null
+  }
+
+  return parse(match[1] +
+    '.' + (match[2] || '0') +
+    '.' + (match[3] || '0'))
+}
+});
+var semver_1 = semver.SEMVER_SPEC_VERSION;
+var semver_2 = semver.re;
+var semver_3 = semver.src;
+var semver_4 = semver.parse;
+var semver_5 = semver.valid;
+var semver_6 = semver.clean;
+var semver_7 = semver.SemVer;
+var semver_8 = semver.inc;
+var semver_9 = semver.diff;
+var semver_10 = semver.compareIdentifiers;
+var semver_11 = semver.rcompareIdentifiers;
+var semver_12 = semver.major;
+var semver_13 = semver.minor;
+var semver_14 = semver.patch;
+var semver_15 = semver.compare;
+var semver_16 = semver.compareLoose;
+var semver_17 = semver.rcompare;
+var semver_18 = semver.sort;
+var semver_19 = semver.rsort;
+var semver_20 = semver.gt;
+var semver_21 = semver.lt;
+var semver_22 = semver.eq;
+var semver_23 = semver.neq;
+var semver_24 = semver.gte;
+var semver_25 = semver.lte;
+var semver_26 = semver.cmp;
+var semver_27 = semver.Comparator;
+var semver_28 = semver.Range;
+var semver_29 = semver.toComparators;
+var semver_30 = semver.satisfies;
+var semver_31 = semver.maxSatisfying;
+var semver_32 = semver.minSatisfying;
+var semver_33 = semver.minVersion;
+var semver_34 = semver.validRange;
+var semver_35 = semver.ltr;
+var semver_36 = semver.gtr;
+var semver_37 = semver.outside;
+var semver_38 = semver.prerelease;
+var semver_39 = semver.intersects;
+var semver_40 = semver.coerce;
+
+const isWin = process.platform === 'win32';
+const isExecutableRegExp = /\.(?:com|exe)$/i;
+const isCmdShimRegExp = /node_modules[\\/].bin[\\/][^\\/]+\.cmd$/i;
+
+// `options.shell` is supported in Node ^4.8.0, ^5.7.0 and >= 6.0.0
+const supportsShellOption = src(() => semver.satisfies(process.version, '^4.8.0 || ^5.7.0 || >= 6.0.0', true)) || false;
+
+function detectShebang(parsed) {
+    parsed.file = resolveCommand_1(parsed);
+
+    const shebang = parsed.file && readShebang_1(parsed.file);
+
+    if (shebang) {
+        parsed.args.unshift(parsed.file);
+        parsed.command = shebang;
+
+        return resolveCommand_1(parsed);
+    }
+
+    return parsed.file;
+}
+
+function parseNonShell(parsed) {
+    if (!isWin) {
+        return parsed;
+    }
+
+    // Detect & add support for shebangs
+    const commandFile = detectShebang(parsed);
+
+    // We don't need a shell if the command filename is an executable
+    const needsShell = !isExecutableRegExp.test(commandFile);
+
+    // If a shell is required, use cmd.exe and take care of escaping everything correctly
+    // Note that `forceShell` is an hidden option used only in tests
+    if (parsed.options.forceShell || needsShell) {
+        // Need to double escape meta chars if the command is a cmd-shim located in `node_modules/.bin/`
+        // The cmd-shim simply calls execute the package bin file with NodeJS, proxying any argument
+        // Because the escape of metachars with ^ gets interpreted when the cmd.exe is first called,
+        // we need to double escape them
+        const needsDoubleEscapeMetaChars = isCmdShimRegExp.test(commandFile);
+
+        // Normalize posix paths into OS compatible paths (e.g.: foo/bar -> foo\bar)
+        // This is necessary otherwise it will always fail with ENOENT in those cases
+        parsed.command = path.normalize(parsed.command);
+
+        // Escape command & arguments
+        parsed.command = _escape.command(parsed.command);
+        parsed.args = parsed.args.map((arg) => _escape.argument(arg, needsDoubleEscapeMetaChars));
+
+        const shellCommand = [parsed.command].concat(parsed.args).join(' ');
+
+        parsed.args = ['/d', '/s', '/c', `"${shellCommand}"`];
+        parsed.command = process.env.comspec || 'cmd.exe';
+        parsed.options.windowsVerbatimArguments = true; // Tell node's spawn that the arguments are already escaped
+    }
+
+    return parsed;
+}
+
+function parseShell(parsed) {
+    // If node supports the shell option, there's no need to mimic its behavior
+    if (supportsShellOption) {
+        return parsed;
+    }
+
+    // Mimic node shell option
+    // See https://github.com/nodejs/node/blob/b9f6a2dc059a1062776133f3d4fd848c4da7d150/lib/child_process.js#L335
+    const shellCommand = [parsed.command].concat(parsed.args).join(' ');
+
+    if (isWin) {
+        parsed.command = typeof parsed.options.shell === 'string' ? parsed.options.shell : process.env.comspec || 'cmd.exe';
+        parsed.args = ['/d', '/s', '/c', `"${shellCommand}"`];
+        parsed.options.windowsVerbatimArguments = true; // Tell node's spawn that the arguments are already escaped
+    } else {
+        if (typeof parsed.options.shell === 'string') {
+            parsed.command = parsed.options.shell;
+        } else if (process.platform === 'android') {
+            parsed.command = '/system/bin/sh';
+        } else {
+            parsed.command = '/bin/sh';
+        }
+
+        parsed.args = ['-c', shellCommand];
+    }
+
+    return parsed;
+}
+
+function parse$1(command, args, options) {
+    // Normalize arguments, similar to nodejs
+    if (args && !Array.isArray(args)) {
+        options = args;
+        args = null;
+    }
+
+    args = args ? args.slice(0) : []; // Clone array to avoid changing the original
+    options = Object.assign({}, options); // Clone object to avoid changing the original
+
+    // Build our parsed object
+    const parsed = {
+        command,
+        args,
+        options,
+        file: undefined,
+        original: {
+            command,
+            args,
+        },
+    };
+
+    // Delegate further parsing to shell or non-shell
+    return options.shell ? parseShell(parsed) : parseNonShell(parsed);
+}
+
+var parse_1 = parse$1;
+
+const isWin$1 = process.platform === 'win32';
+
+function notFoundError(original, syscall) {
+    return Object.assign(new Error(`${syscall} ${original.command} ENOENT`), {
+        code: 'ENOENT',
+        errno: 'ENOENT',
+        syscall: `${syscall} ${original.command}`,
+        path: original.command,
+        spawnargs: original.args,
+    });
+}
+
+function hookChildProcess(cp, parsed) {
+    if (!isWin$1) {
+        return;
+    }
+
+    const originalEmit = cp.emit;
+
+    cp.emit = function (name, arg1) {
+        // If emitting "exit" event and exit code is 1, we need to check if
+        // the command exists and emit an "error" instead
+        // See https://github.com/IndigoUnited/node-cross-spawn/issues/16
+        if (name === 'exit') {
+            const err = verifyENOENT(arg1, parsed);
+
+            if (err) {
+                return originalEmit.call(cp, 'error', err);
+            }
+        }
+
+        return originalEmit.apply(cp, arguments); // eslint-disable-line prefer-rest-params
+    };
+}
+
+function verifyENOENT(status, parsed) {
+    if (isWin$1 && status === 1 && !parsed.file) {
+        return notFoundError(parsed.original, 'spawn');
+    }
+
+    return null;
+}
+
+function verifyENOENTSync(status, parsed) {
+    if (isWin$1 && status === 1 && !parsed.file) {
+        return notFoundError(parsed.original, 'spawnSync');
+    }
+
+    return null;
+}
+
+var enoent = {
+    hookChildProcess,
+    verifyENOENT,
+    verifyENOENTSync,
+    notFoundError,
+};
+
+function spawn(command, args, options) {
+    // Parse the arguments
+    const parsed = parse_1(command, args, options);
+
+    // Spawn the child process
+    const spawned = child_process.spawn(parsed.command, parsed.args, parsed.options);
+
+    // Hook into child process "exit" event to emit an error if the command
+    // does not exists, see: https://github.com/IndigoUnited/node-cross-spawn/issues/16
+    enoent.hookChildProcess(spawned, parsed);
+
+    return spawned;
+}
+
+function spawnSync(command, args, options) {
+    // Parse the arguments
+    const parsed = parse_1(command, args, options);
+
+    // Spawn the child process
+    const result = child_process.spawnSync(parsed.command, parsed.args, parsed.options);
+
+    // Analyze if the command does not exist, see: https://github.com/IndigoUnited/node-cross-spawn/issues/16
+    result.error = result.error || enoent.verifyENOENTSync(result.status, parsed);
+
+    return result;
+}
+
+var crossSpawn = spawn;
+var spawn_1 = spawn;
+var sync$3 = spawnSync;
+
+var _parse = parse_1;
+var _enoent = enoent;
+crossSpawn.spawn = spawn_1;
+crossSpawn.sync = sync$3;
+crossSpawn._parse = _parse;
+crossSpawn._enoent = _enoent;
+
+var stripEof = function (x) {
+	var lf = typeof x === 'string' ? '\n' : '\n'.charCodeAt();
+	var cr = typeof x === 'string' ? '\r' : '\r'.charCodeAt();
+
+	if (x[x.length - 1] === lf) {
+		x = x.slice(0, x.length - 1);
+	}
+
+	if (x[x.length - 1] === cr) {
+		x = x.slice(0, x.length - 1);
+	}
+
+	return x;
+};
+
+var npmRunPath = createCommonjsModule(function (module) {
+
+
+
+module.exports = opts => {
+	opts = Object.assign({
+		cwd: process.cwd(),
+		path: process.env[pathKey()]
+	}, opts);
+
+	let prev;
+	let pth = path.resolve(opts.cwd);
+	const ret = [];
+
+	while (prev !== pth) {
+		ret.push(path.join(pth, 'node_modules/.bin'));
+		prev = pth;
+		pth = path.resolve(pth, '..');
+	}
+
+	// ensure the running `node` binary is used
+	ret.push(path.dirname(process.execPath));
+
+	return ret.concat(opts.path).join(path.delimiter);
+};
+
+module.exports.env = opts => {
+	opts = Object.assign({
+		env: process.env
+	}, opts);
+
+	const env = Object.assign({}, opts.env);
+	const path = pathKey({env});
+
+	opts.path = env[path];
+	env[path] = module.exports(opts);
+
+	return env;
+};
+});
+var npmRunPath_1 = npmRunPath.env;
+
+var isStream_1 = createCommonjsModule(function (module) {
+
+var isStream = module.exports = function (stream) {
+	return stream !== null && typeof stream === 'object' && typeof stream.pipe === 'function';
+};
+
+isStream.writable = function (stream) {
+	return isStream(stream) && stream.writable !== false && typeof stream._write === 'function' && typeof stream._writableState === 'object';
+};
+
+isStream.readable = function (stream) {
+	return isStream(stream) && stream.readable !== false && typeof stream._read === 'function' && typeof stream._readableState === 'object';
+};
+
+isStream.duplex = function (stream) {
+	return isStream.writable(stream) && isStream.readable(stream);
+};
+
+isStream.transform = function (stream) {
+	return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
+};
+});
+
+var noop = function() {};
+
+var isRequest$1 = function(stream) {
+	return stream.setHeader && typeof stream.abort === 'function';
+};
+
+var isChildProcess = function(stream) {
+	return stream.stdio && Array.isArray(stream.stdio) && stream.stdio.length === 3
+};
+
+var eos = function(stream, opts, callback) {
+	if (typeof opts === 'function') return eos(stream, null, opts);
+	if (!opts) opts = {};
+
+	callback = once_1(callback || noop);
+
+	var ws = stream._writableState;
+	var rs = stream._readableState;
+	var readable = opts.readable || (opts.readable !== false && stream.readable);
+	var writable = opts.writable || (opts.writable !== false && stream.writable);
+	var cancelled = false;
+
+	var onlegacyfinish = function() {
+		if (!stream.writable) onfinish();
+	};
+
+	var onfinish = function() {
+		writable = false;
+		if (!readable) callback.call(stream);
+	};
+
+	var onend = function() {
+		readable = false;
+		if (!writable) callback.call(stream);
+	};
+
+	var onexit = function(exitCode) {
+		callback.call(stream, exitCode ? new Error('exited with error code: ' + exitCode) : null);
+	};
+
+	var onerror = function(err) {
+		callback.call(stream, err);
+	};
+
+	var onclose = function() {
+		process.nextTick(onclosenexttick);
+	};
+
+	var onclosenexttick = function() {
+		if (cancelled) return;
+		if (readable && !(rs && (rs.ended && !rs.destroyed))) return callback.call(stream, new Error('premature close'));
+		if (writable && !(ws && (ws.ended && !ws.destroyed))) return callback.call(stream, new Error('premature close'));
+	};
+
+	var onrequest = function() {
+		stream.req.on('finish', onfinish);
+	};
+
+	if (isRequest$1(stream)) {
+		stream.on('complete', onfinish);
+		stream.on('abort', onclose);
+		if (stream.req) onrequest();
+		else stream.on('request', onrequest);
+	} else if (writable && !ws) { // legacy streams
+		stream.on('end', onlegacyfinish);
+		stream.on('close', onlegacyfinish);
+	}
+
+	if (isChildProcess(stream)) stream.on('exit', onexit);
+
+	stream.on('end', onend);
+	stream.on('finish', onfinish);
+	if (opts.error !== false) stream.on('error', onerror);
+	stream.on('close', onclose);
+
+	return function() {
+		cancelled = true;
+		stream.removeListener('complete', onfinish);
+		stream.removeListener('abort', onclose);
+		stream.removeListener('request', onrequest);
+		if (stream.req) stream.req.removeListener('finish', onfinish);
+		stream.removeListener('end', onlegacyfinish);
+		stream.removeListener('close', onlegacyfinish);
+		stream.removeListener('finish', onfinish);
+		stream.removeListener('exit', onexit);
+		stream.removeListener('end', onend);
+		stream.removeListener('error', onerror);
+		stream.removeListener('close', onclose);
+	};
+};
+
+var endOfStream = eos;
+
+// we only need fs to get the ReadStream and WriteStream prototypes
+
+var noop$1 = function () {};
+var ancient = /^v?\.0/.test(process.version);
+
+var isFn = function (fn) {
+  return typeof fn === 'function'
+};
+
+var isFS = function (stream) {
+  if (!ancient) return false // newer node version do not need to care about fs is a special way
+  if (!fs) return false // browser
+  return (stream instanceof (fs.ReadStream || noop$1) || stream instanceof (fs.WriteStream || noop$1)) && isFn(stream.close)
+};
+
+var isRequest$2 = function (stream) {
+  return stream.setHeader && isFn(stream.abort)
+};
+
+var destroyer = function (stream, reading, writing, callback) {
+  callback = once_1(callback);
+
+  var closed = false;
+  stream.on('close', function () {
+    closed = true;
+  });
+
+  endOfStream(stream, {readable: reading, writable: writing}, function (err) {
+    if (err) return callback(err)
+    closed = true;
+    callback();
+  });
+
+  var destroyed = false;
+  return function (err) {
+    if (closed) return
+    if (destroyed) return
+    destroyed = true;
+
+    if (isFS(stream)) return stream.close(noop$1) // use close for fs streams to avoid fd leaks
+    if (isRequest$2(stream)) return stream.abort() // request.destroy just do .end - .abort is what we want
+
+    if (isFn(stream.destroy)) return stream.destroy()
+
+    callback(err || new Error('stream was destroyed'));
+  }
+};
+
+var call = function (fn) {
+  fn();
+};
+
+var pipe = function (from, to) {
+  return from.pipe(to)
+};
+
+var pump = function () {
+  var streams = Array.prototype.slice.call(arguments);
+  var callback = isFn(streams[streams.length - 1] || noop$1) && streams.pop() || noop$1;
+
+  if (Array.isArray(streams[0])) streams = streams[0];
+  if (streams.length < 2) throw new Error('pump requires two streams per minimum')
+
+  var error;
+  var destroys = streams.map(function (stream, i) {
+    var reading = i < streams.length - 1;
+    var writing = i > 0;
+    return destroyer(stream, reading, writing, function (err) {
+      if (!error) error = err;
+      if (err) destroys.forEach(call);
+      if (reading) return
+      destroys.forEach(call);
+      callback(error);
+    })
+  });
+
+  return streams.reduce(pipe)
+};
+
+var pump_1 = pump;
+
+const {PassThrough: PassThrough$2} = Stream;
+
+var bufferStream = options => {
+	options = Object.assign({}, options);
+
+	const {array} = options;
+	let {encoding} = options;
+	const buffer = encoding === 'buffer';
+	let objectMode = false;
+
+	if (array) {
+		objectMode = !(encoding || buffer);
+	} else {
+		encoding = encoding || 'utf8';
+	}
+
+	if (buffer) {
+		encoding = null;
+	}
+
+	let len = 0;
+	const ret = [];
+	const stream = new PassThrough$2({objectMode});
+
+	if (encoding) {
+		stream.setEncoding(encoding);
+	}
+
+	stream.on('data', chunk => {
+		ret.push(chunk);
+
+		if (objectMode) {
+			len = ret.length;
+		} else {
+			len += chunk.length;
+		}
+	});
+
+	stream.getBufferedValue = () => {
+		if (array) {
+			return ret;
+		}
+
+		return buffer ? Buffer.concat(ret, len) : ret.join('');
+	};
+
+	stream.getBufferedLength = () => len;
+
+	return stream;
+};
+
+class MaxBufferError extends Error {
+	constructor() {
+		super('maxBuffer exceeded');
+		this.name = 'MaxBufferError';
+	}
+}
+
+function getStream(inputStream, options) {
+	if (!inputStream) {
+		return Promise.reject(new Error('Expected a stream'));
+	}
+
+	options = Object.assign({maxBuffer: Infinity}, options);
+
+	const {maxBuffer} = options;
+
+	let stream;
+	return new Promise((resolve, reject) => {
+		const rejectPromise = error => {
+			if (error) { // A null check
+				error.bufferedData = stream.getBufferedValue();
+			}
+			reject(error);
+		};
+
+		stream = pump_1(inputStream, bufferStream(options), error => {
+			if (error) {
+				rejectPromise(error);
+				return;
+			}
+
+			resolve();
+		});
+
+		stream.on('data', () => {
+			if (stream.getBufferedLength() > maxBuffer) {
+				rejectPromise(new MaxBufferError());
+			}
+		});
+	}).then(() => stream.getBufferedValue());
+}
+
+var getStream_1 = getStream;
+var buffer = (stream, options) => getStream(stream, Object.assign({}, options, {encoding: 'buffer'}));
+var array = (stream, options) => getStream(stream, Object.assign({}, options, {array: true}));
+var MaxBufferError_1 = MaxBufferError;
+getStream_1.buffer = buffer;
+getStream_1.array = array;
+getStream_1.MaxBufferError = MaxBufferError_1;
+
+var pFinally = (promise, onFinally) => {
+	onFinally = onFinally || (() => {});
+
+	return promise.then(
+		val => new Promise(resolve => {
+			resolve(onFinally());
+		}).then(() => val),
+		err => new Promise(resolve => {
+			resolve(onFinally());
+		}).then(() => {
+			throw err;
+		})
+	);
+};
+
+var signals = createCommonjsModule(function (module) {
+// This is not the set of all possible signals.
+//
+// It IS, however, the set of all signals that trigger
+// an exit on either Linux or BSD systems.  Linux is a
+// superset of the signal names supported on BSD, and
+// the unknown signals just fail to register, so we can
+// catch that easily enough.
+//
+// Don't bother with SIGKILL.  It's uncatchable, which
+// means that we can't fire any callbacks anyway.
+//
+// If a user does happen to register a handler on a non-
+// fatal signal like SIGWINCH or something, and then
+// exit, it'll end up firing `process.emit('exit')`, so
+// the handler will be fired anyway.
+//
+// SIGBUS, SIGFPE, SIGSEGV and SIGILL, when not raised
+// artificially, inherently leave the process in a
+// state from which it is not safe to try and enter JS
+// listeners.
+module.exports = [
+  'SIGABRT',
+  'SIGALRM',
+  'SIGHUP',
+  'SIGINT',
+  'SIGTERM'
+];
+
+if (process.platform !== 'win32') {
+  module.exports.push(
+    'SIGVTALRM',
+    'SIGXCPU',
+    'SIGXFSZ',
+    'SIGUSR2',
+    'SIGTRAP',
+    'SIGSYS',
+    'SIGQUIT',
+    'SIGIOT'
+    // should detect profiler and enable/disable accordingly.
+    // see #21
+    // 'SIGPROF'
+  );
+}
+
+if (process.platform === 'linux') {
+  module.exports.push(
+    'SIGIO',
+    'SIGPOLL',
+    'SIGPWR',
+    'SIGSTKFLT',
+    'SIGUNUSED'
+  );
+}
+});
+
+// Note: since nyc uses this module to output coverage, any lines
+// that are in the direct sync flow of nyc's outputCoverage are
+// ignored, since we can never get coverage for them.
+
+var signals$1 = signals;
+
+var EE = events;
+/* istanbul ignore if */
+if (typeof EE !== 'function') {
+  EE = EE.EventEmitter;
+}
+
+var emitter;
+if (process.__signal_exit_emitter__) {
+  emitter = process.__signal_exit_emitter__;
+} else {
+  emitter = process.__signal_exit_emitter__ = new EE();
+  emitter.count = 0;
+  emitter.emitted = {};
+}
+
+// Because this emitter is a global, we have to check to see if a
+// previous version of this library failed to enable infinite listeners.
+// I know what you're about to say.  But literally everything about
+// signal-exit is a compromise with evil.  Get used to it.
+if (!emitter.infinite) {
+  emitter.setMaxListeners(Infinity);
+  emitter.infinite = true;
+}
+
+var signalExit = function (cb, opts) {
+  assert.equal(typeof cb, 'function', 'a callback must be provided for exit handler');
+
+  if (loaded === false) {
+    load();
+  }
+
+  var ev = 'exit';
+  if (opts && opts.alwaysLast) {
+    ev = 'afterexit';
+  }
+
+  var remove = function () {
+    emitter.removeListener(ev, cb);
+    if (emitter.listeners('exit').length === 0 &&
+        emitter.listeners('afterexit').length === 0) {
+      unload();
+    }
+  };
+  emitter.on(ev, cb);
+
+  return remove
+};
+
+var unload_1 = unload;
+function unload () {
+  if (!loaded) {
+    return
+  }
+  loaded = false;
+
+  signals$1.forEach(function (sig) {
+    try {
+      process.removeListener(sig, sigListeners[sig]);
+    } catch (er) {}
+  });
+  process.emit = originalProcessEmit;
+  process.reallyExit = originalProcessReallyExit;
+  emitter.count -= 1;
+}
+
+function emit (event, code, signal) {
+  if (emitter.emitted[event]) {
+    return
+  }
+  emitter.emitted[event] = true;
+  emitter.emit(event, code, signal);
+}
+
+// { <signal>: <listener fn>, ... }
+var sigListeners = {};
+signals$1.forEach(function (sig) {
+  sigListeners[sig] = function listener () {
+    // If there are no other listeners, an exit is coming!
+    // Simplest way: remove us and then re-send the signal.
+    // We know that this will kill the process, so we can
+    // safely emit now.
+    var listeners = process.listeners(sig);
+    if (listeners.length === emitter.count) {
+      unload();
+      emit('exit', null, sig);
+      /* istanbul ignore next */
+      emit('afterexit', null, sig);
+      /* istanbul ignore next */
+      process.kill(process.pid, sig);
+    }
+  };
+});
+
+var signals_1 = function () {
+  return signals$1
+};
+
+var load_1 = load;
+
+var loaded = false;
+
+function load () {
+  if (loaded) {
+    return
+  }
+  loaded = true;
+
+  // This is the number of onSignalExit's that are in play.
+  // It's important so that we can count the correct number of
+  // listeners on signals, and don't wait for the other one to
+  // handle it instead of us.
+  emitter.count += 1;
+
+  signals$1 = signals$1.filter(function (sig) {
+    try {
+      process.on(sig, sigListeners[sig]);
+      return true
+    } catch (er) {
+      return false
+    }
+  });
+
+  process.emit = processEmit;
+  process.reallyExit = processReallyExit;
+}
+
+var originalProcessReallyExit = process.reallyExit;
+function processReallyExit (code) {
+  process.exitCode = code || 0;
+  emit('exit', process.exitCode, null);
+  /* istanbul ignore next */
+  emit('afterexit', process.exitCode, null);
+  /* istanbul ignore next */
+  originalProcessReallyExit.call(process, process.exitCode);
+}
+
+var originalProcessEmit = process.emit;
+function processEmit (ev, arg) {
+  if (ev === 'exit') {
+    if (arg !== undefined) {
+      process.exitCode = arg;
+    }
+    var ret = originalProcessEmit.apply(this, arguments);
+    emit('exit', process.exitCode, null);
+    /* istanbul ignore next */
+    emit('afterexit', process.exitCode, null);
+    return ret
+  } else {
+    return originalProcessEmit.apply(this, arguments)
+  }
+}
+signalExit.unload = unload_1;
+signalExit.signals = signals_1;
+signalExit.load = load_1;
+
+var errname_1 = createCommonjsModule(function (module) {
+// Older verions of Node.js might not have `util.getSystemErrorName()`.
+// In that case, fall back to a deprecated internal.
+
+
+let uv;
+
+if (typeof util.getSystemErrorName === 'function') {
+	module.exports = util.getSystemErrorName;
+} else {
+	try {
+		uv = process.binding('uv');
+
+		if (typeof uv.errname !== 'function') {
+			throw new TypeError('uv.errname is not a function');
+		}
+	} catch (err) {
+		console.error('execa/lib/errname: unable to establish process.binding(\'uv\')', err);
+		uv = null;
+	}
+
+	module.exports = code => errname(uv, code);
+}
+
+// Used for testing the fallback behavior
+module.exports.__test__ = errname;
+
+function errname(uv, code) {
+	if (uv) {
+		return uv.errname(code);
+	}
+
+	if (!(code < 0)) {
+		throw new Error('err >= 0');
+	}
+
+	return `Unknown system error ${code}`;
+}
+});
+var errname_2 = errname_1.__test__;
+
+const alias = ['stdin', 'stdout', 'stderr'];
+
+const hasAlias = opts => alias.some(x => Boolean(opts[x]));
+
+var stdio = opts => {
+	if (!opts) {
+		return null;
+	}
+
+	if (opts.stdio && hasAlias(opts)) {
+		throw new Error(`It's not possible to provide \`stdio\` in combination with one of ${alias.map(x => `\`${x}\``).join(', ')}`);
+	}
+
+	if (typeof opts.stdio === 'string') {
+		return opts.stdio;
+	}
+
+	const stdio = opts.stdio || [];
+
+	if (!Array.isArray(stdio)) {
+		throw new TypeError(`Expected \`stdio\` to be of type \`string\` or \`Array\`, got \`${typeof stdio}\``);
+	}
+
+	const result = [];
+	const len = Math.max(stdio.length, alias.length);
+
+	for (let i = 0; i < len; i++) {
+		let value = null;
+
+		if (stdio[i] !== undefined) {
+			value = stdio[i];
+		} else if (opts[alias[i]] !== undefined) {
+			value = opts[alias[i]];
+		}
+
+		result[i] = value;
+	}
+
+	return result;
+};
+
+var execa = createCommonjsModule(function (module) {
 
 
 
 
-const VERSION = "4.3.1";
 
-class GraphqlError extends Error {
-  constructor(request, response) {
+
+
+
+
+
+
+
+const TEN_MEGABYTES = 1000 * 1000 * 10;
+
+function handleArgs(cmd, args, opts) {
+	let parsed;
+
+	opts = Object.assign({
+		extendEnv: true,
+		env: {}
+	}, opts);
+
+	if (opts.extendEnv) {
+		opts.env = Object.assign({}, process.env, opts.env);
+	}
+
+	if (opts.__winShell === true) {
+		delete opts.__winShell;
+		parsed = {
+			command: cmd,
+			args,
+			options: opts,
+			file: cmd,
+			original: {
+				cmd,
+				args
+			}
+		};
+	} else {
+		parsed = crossSpawn._parse(cmd, args, opts);
+	}
+
+	opts = Object.assign({
+		maxBuffer: TEN_MEGABYTES,
+		buffer: true,
+		stripEof: true,
+		preferLocal: true,
+		localDir: parsed.options.cwd || process.cwd(),
+		encoding: 'utf8',
+		reject: true,
+		cleanup: true
+	}, parsed.options);
+
+	opts.stdio = stdio(opts);
+
+	if (opts.preferLocal) {
+		opts.env = npmRunPath.env(Object.assign({}, opts, {cwd: opts.localDir}));
+	}
+
+	if (opts.detached) {
+		// #115
+		opts.cleanup = false;
+	}
+
+	if (process.platform === 'win32' && path.basename(parsed.command) === 'cmd.exe') {
+		// #116
+		parsed.args.unshift('/q');
+	}
+
+	return {
+		cmd: parsed.command,
+		args: parsed.args,
+		opts,
+		parsed
+	};
+}
+
+function handleInput(spawned, input) {
+	if (input === null || input === undefined) {
+		return;
+	}
+
+	if (isStream_1(input)) {
+		input.pipe(spawned.stdin);
+	} else {
+		spawned.stdin.end(input);
+	}
+}
+
+function handleOutput(opts, val) {
+	if (val && opts.stripEof) {
+		val = stripEof(val);
+	}
+
+	return val;
+}
+
+function handleShell(fn, cmd, opts) {
+	let file = '/bin/sh';
+	let args = ['-c', cmd];
+
+	opts = Object.assign({}, opts);
+
+	if (process.platform === 'win32') {
+		opts.__winShell = true;
+		file = process.env.comspec || 'cmd.exe';
+		args = ['/s', '/c', `"${cmd}"`];
+		opts.windowsVerbatimArguments = true;
+	}
+
+	if (opts.shell) {
+		file = opts.shell;
+		delete opts.shell;
+	}
+
+	return fn(file, args, opts);
+}
+
+function getStream(process, stream, {encoding, buffer, maxBuffer}) {
+	if (!process[stream]) {
+		return null;
+	}
+
+	let ret;
+
+	if (!buffer) {
+		// TODO: Use `ret = util.promisify(stream.finished)(process[stream]);` when targeting Node.js 10
+		ret = new Promise((resolve, reject) => {
+			process[stream]
+				.once('end', resolve)
+				.once('error', reject);
+		});
+	} else if (encoding) {
+		ret = getStream_1(process[stream], {
+			encoding,
+			maxBuffer
+		});
+	} else {
+		ret = getStream_1.buffer(process[stream], {maxBuffer});
+	}
+
+	return ret.catch(err => {
+		err.stream = stream;
+		err.message = `${stream} ${err.message}`;
+		throw err;
+	});
+}
+
+function makeError(result, options) {
+	const {stdout, stderr} = result;
+
+	let err = result.error;
+	const {code, signal} = result;
+
+	const {parsed, joinedCmd} = options;
+	const timedOut = options.timedOut || false;
+
+	if (!err) {
+		let output = '';
+
+		if (Array.isArray(parsed.opts.stdio)) {
+			if (parsed.opts.stdio[2] !== 'inherit') {
+				output += output.length > 0 ? stderr : `\n${stderr}`;
+			}
+
+			if (parsed.opts.stdio[1] !== 'inherit') {
+				output += `\n${stdout}`;
+			}
+		} else if (parsed.opts.stdio !== 'inherit') {
+			output = `\n${stderr}${stdout}`;
+		}
+
+		err = new Error(`Command failed: ${joinedCmd}${output}`);
+		err.code = code < 0 ? errname_1(code) : code;
+	}
+
+	err.stdout = stdout;
+	err.stderr = stderr;
+	err.failed = true;
+	err.signal = signal || null;
+	err.cmd = joinedCmd;
+	err.timedOut = timedOut;
+
+	return err;
+}
+
+function joinCmd(cmd, args) {
+	let joinedCmd = cmd;
+
+	if (Array.isArray(args) && args.length > 0) {
+		joinedCmd += ' ' + args.join(' ');
+	}
+
+	return joinedCmd;
+}
+
+module.exports = (cmd, args, opts) => {
+	const parsed = handleArgs(cmd, args, opts);
+	const {encoding, buffer, maxBuffer} = parsed.opts;
+	const joinedCmd = joinCmd(cmd, args);
+
+	let spawned;
+	try {
+		spawned = child_process.spawn(parsed.cmd, parsed.args, parsed.opts);
+	} catch (err) {
+		return Promise.reject(err);
+	}
+
+	let removeExitHandler;
+	if (parsed.opts.cleanup) {
+		removeExitHandler = signalExit(() => {
+			spawned.kill();
+		});
+	}
+
+	let timeoutId = null;
+	let timedOut = false;
+
+	const cleanup = () => {
+		if (timeoutId) {
+			clearTimeout(timeoutId);
+			timeoutId = null;
+		}
+
+		if (removeExitHandler) {
+			removeExitHandler();
+		}
+	};
+
+	if (parsed.opts.timeout > 0) {
+		timeoutId = setTimeout(() => {
+			timeoutId = null;
+			timedOut = true;
+			spawned.kill(parsed.opts.killSignal);
+		}, parsed.opts.timeout);
+	}
+
+	const processDone = new Promise(resolve => {
+		spawned.on('exit', (code, signal) => {
+			cleanup();
+			resolve({code, signal});
+		});
+
+		spawned.on('error', err => {
+			cleanup();
+			resolve({error: err});
+		});
+
+		if (spawned.stdin) {
+			spawned.stdin.on('error', err => {
+				cleanup();
+				resolve({error: err});
+			});
+		}
+	});
+
+	function destroy() {
+		if (spawned.stdout) {
+			spawned.stdout.destroy();
+		}
+
+		if (spawned.stderr) {
+			spawned.stderr.destroy();
+		}
+	}
+
+	const handlePromise = () => pFinally(Promise.all([
+		processDone,
+		getStream(spawned, 'stdout', {encoding, buffer, maxBuffer}),
+		getStream(spawned, 'stderr', {encoding, buffer, maxBuffer})
+	]).then(arr => {
+		const result = arr[0];
+		result.stdout = arr[1];
+		result.stderr = arr[2];
+
+		if (result.error || result.code !== 0 || result.signal !== null) {
+			const err = makeError(result, {
+				joinedCmd,
+				parsed,
+				timedOut
+			});
+
+			// TODO: missing some timeout logic for killed
+			// https://github.com/nodejs/node/blob/master/lib/child_process.js#L203
+			// err.killed = spawned.killed || killed;
+			err.killed = err.killed || spawned.killed;
+
+			if (!parsed.opts.reject) {
+				return err;
+			}
+
+			throw err;
+		}
+
+		return {
+			stdout: handleOutput(parsed.opts, result.stdout),
+			stderr: handleOutput(parsed.opts, result.stderr),
+			code: 0,
+			failed: false,
+			killed: false,
+			signal: null,
+			cmd: joinedCmd,
+			timedOut: false
+		};
+	}), destroy);
+
+	crossSpawn._enoent.hookChildProcess(spawned, parsed.parsed);
+
+	handleInput(spawned, parsed.opts.input);
+
+	spawned.then = (onfulfilled, onrejected) => handlePromise().then(onfulfilled, onrejected);
+	spawned.catch = onrejected => handlePromise().catch(onrejected);
+
+	return spawned;
+};
+
+// TODO: set `stderr: 'ignore'` when that option is implemented
+module.exports.stdout = (...args) => module.exports(...args).then(x => x.stdout);
+
+// TODO: set `stdout: 'ignore'` when that option is implemented
+module.exports.stderr = (...args) => module.exports(...args).then(x => x.stderr);
+
+module.exports.shell = (cmd, opts) => handleShell(module.exports, cmd, opts);
+
+module.exports.sync = (cmd, args, opts) => {
+	const parsed = handleArgs(cmd, args, opts);
+	const joinedCmd = joinCmd(cmd, args);
+
+	if (isStream_1(parsed.opts.input)) {
+		throw new TypeError('The `input` option cannot be a stream in sync mode');
+	}
+
+	const result = child_process.spawnSync(parsed.cmd, parsed.args, parsed.opts);
+	result.code = result.status;
+
+	if (result.error || result.status !== 0 || result.signal !== null) {
+		const err = makeError(result, {
+			joinedCmd,
+			parsed
+		});
+
+		if (!parsed.opts.reject) {
+			return err;
+		}
+
+		throw err;
+	}
+
+	return {
+		stdout: handleOutput(parsed.opts, result.stdout),
+		stderr: handleOutput(parsed.opts, result.stderr),
+		code: 0,
+		failed: false,
+		signal: null,
+		cmd: joinedCmd,
+		timedOut: false
+	};
+};
+
+module.exports.shellSync = (cmd, opts) => handleShell(module.exports.sync, cmd, opts);
+});
+var execa_1 = execa.stdout;
+var execa_2 = execa.stderr;
+var execa_3 = execa.shell;
+var execa_4 = execa.sync;
+var execa_5 = execa.shellSync;
+
+// Reference: https://www.gaijin.at/en/lstwinver.php
+const names = new Map([
+	['10.0', '10'],
+	['6.3', '8.1'],
+	['6.2', '8'],
+	['6.1', '7'],
+	['6.0', 'Vista'],
+	['5.2', 'Server 2003'],
+	['5.1', 'XP'],
+	['5.0', '2000'],
+	['4.9', 'ME'],
+	['4.1', '98'],
+	['4.0', '95']
+]);
+
+const windowsRelease = release => {
+	const version = /\d+\.\d/.exec(release || os.release());
+
+	if (release && !version) {
+		throw new Error('`release` argument doesn\'t match `n.n`');
+	}
+
+	const ver = (version || [])[0];
+
+	// Server 2008, 2012 and 2016 versions are ambiguous with desktop versions and must be detected at runtime.
+	// If `release` is omitted or we're on a Windows system, and the version number is an ambiguous version
+	// then use `wmic` to get the OS caption: https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
+	// If the resulting caption contains the year 2008, 2012 or 2016, it is a server version, so return a server OS name.
+	if ((!release || release === os.release()) && ['6.1', '6.2', '6.3', '10.0'].includes(ver)) {
+		const stdout = execa.sync('wmic', ['os', 'get', 'Caption']).stdout || '';
+		const year = (stdout.match(/2008|2012|2016/) || [])[0];
+		if (year) {
+			return `Server ${year}`;
+		}
+	}
+
+	return names.get(ver);
+};
+
+var windowsRelease_1 = windowsRelease;
+
+const osName = (platform, release) => {
+	if (!platform && release) {
+		throw new Error('You can\'t specify a `release` without specifying `platform`');
+	}
+
+	platform = platform || os.platform();
+
+	let id;
+
+	if (platform === 'darwin') {
+		if (!release && os.platform() === 'darwin') {
+			release = os.release();
+		}
+
+		const prefix = release ? (Number(release.split('.')[0]) > 15 ? 'macOS' : 'OS X') : 'macOS';
+		id = release ? macosRelease_1(release).name : '';
+		return prefix + (id ? ' ' + id : '');
+	}
+
+	if (platform === 'linux') {
+		if (!release && os.platform() === 'linux') {
+			release = os.release();
+		}
+
+		id = release ? release.replace(/^(\d+\.\d+).*/, '$1') : '';
+		return 'Linux' + (id ? ' ' + id : '');
+	}
+
+	if (platform === 'win32') {
+		if (!release && os.platform() === 'win32') {
+			release = os.release();
+		}
+
+		id = release ? windowsRelease_1(release) : '';
+		return 'Windows' + (id ? ' ' + id : '');
+	}
+
+	return platform;
+};
+
+var osName_1 = osName;
+
+var universalUserAgent = getUserAgentNode;
+
+
+
+function getUserAgentNode () {
+  try {
+    return `Node.js/${process.version.substr(1)} (${osName_1()}; ${process.arch})`
+  } catch (error) {
+    if (/wmic os get Caption/.test(error.message)) {
+      return 'Windows <version undetectable>'
+    }
+
+    throw error
+  }
+}
+
+var name = "@octokit/graphql";
+var version = "2.1.3";
+var publishConfig = {
+	access: "public"
+};
+var description = "GitHub GraphQL API client for browsers and Node";
+var main = "index.js";
+var scripts = {
+	prebuild: "mkdirp dist/",
+	build: "npm-run-all build:*",
+	"build:development": "webpack --mode development --entry . --output-library=octokitGraphql --output=./dist/octokit-graphql.js --profile --json > dist/bundle-stats.json",
+	"build:production": "webpack --mode production --entry . --plugin=compression-webpack-plugin --output-library=octokitGraphql --output-path=./dist --output-filename=octokit-graphql.min.js --devtool source-map",
+	"bundle-report": "webpack-bundle-analyzer dist/bundle-stats.json --mode=static --no-open --report dist/bundle-report.html",
+	coverage: "nyc report --reporter=html && open coverage/index.html",
+	"coverage:upload": "nyc report --reporter=text-lcov | coveralls",
+	pretest: "standard",
+	test: "nyc mocha test/*-test.js",
+	"test:browser": "cypress run --browser chrome"
+};
+var repository = {
+	type: "git",
+	url: "https://github.com/octokit/graphql.js.git"
+};
+var keywords = [
+	"octokit",
+	"github",
+	"api",
+	"graphql"
+];
+var author = "Gregor Martynus (https://github.com/gr2m)";
+var license = "MIT";
+var bugs = {
+	url: "https://github.com/octokit/graphql.js/issues"
+};
+var homepage = "https://github.com/octokit/graphql.js#readme";
+var dependencies = {
+	"@octokit/request": "^5.0.0",
+	"universal-user-agent": "^2.0.3"
+};
+var devDependencies = {
+	chai: "^4.2.0",
+	"compression-webpack-plugin": "^2.0.0",
+	coveralls: "^3.0.3",
+	cypress: "^3.1.5",
+	"fetch-mock": "^7.3.1",
+	mkdirp: "^0.5.1",
+	mocha: "^6.0.0",
+	"npm-run-all": "^4.1.3",
+	nyc: "^14.0.0",
+	"semantic-release": "^15.13.3",
+	"simple-mock": "^0.8.0",
+	standard: "^12.0.1",
+	webpack: "^4.29.6",
+	"webpack-bundle-analyzer": "^3.1.0",
+	"webpack-cli": "^3.2.3"
+};
+var bundlesize = [
+	{
+		path: "./dist/octokit-graphql.min.js.gz",
+		maxSize: "5KB"
+	}
+];
+var release = {
+	publish: [
+		"@semantic-release/npm",
+		{
+			path: "@semantic-release/github",
+			assets: [
+				"dist/*",
+				"!dist/*.map.gz"
+			]
+		}
+	]
+};
+var standard = {
+	globals: [
+		"describe",
+		"before",
+		"beforeEach",
+		"afterEach",
+		"after",
+		"it",
+		"expect"
+	]
+};
+var files = [
+	"lib"
+];
+var _package = {
+	name: name,
+	version: version,
+	publishConfig: publishConfig,
+	description: description,
+	main: main,
+	scripts: scripts,
+	repository: repository,
+	keywords: keywords,
+	author: author,
+	license: license,
+	bugs: bugs,
+	homepage: homepage,
+	dependencies: dependencies,
+	devDependencies: devDependencies,
+	bundlesize: bundlesize,
+	release: release,
+	standard: standard,
+	files: files
+};
+
+var _package$1 = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  name: name,
+  version: version,
+  publishConfig: publishConfig,
+  description: description,
+  main: main,
+  scripts: scripts,
+  repository: repository,
+  keywords: keywords,
+  author: author,
+  license: license,
+  bugs: bugs,
+  homepage: homepage,
+  dependencies: dependencies,
+  devDependencies: devDependencies,
+  bundlesize: bundlesize,
+  release: release,
+  standard: standard,
+  files: files,
+  'default': _package
+});
+
+var error = class GraphqlError extends Error {
+  constructor (request, response) {
     const message = response.data.errors[0].message;
     super(message);
+
     Object.assign(this, response.data);
-    this.name = "GraphqlError";
-    this.request = request; // Maintains proper stack trace (only available on V8)
+    this.name = 'GraphqlError';
+    this.request = request;
 
+    // Maintains proper stack trace (only available on V8)
     /* istanbul ignore next */
-
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
   }
+};
 
-}
+var graphql_1 = graphql;
 
-const NON_VARIABLE_OPTIONS = ["method", "baseUrl", "url", "headers", "request", "query"];
-function graphql(request, query, options) {
-  options = typeof query === "string" ? options = Object.assign({
-    query
-  }, options) : options = query;
+
+
+const NON_VARIABLE_OPTIONS = ['method', 'baseUrl', 'url', 'headers', 'request', 'query'];
+
+function graphql (request, query, options) {
+  if (typeof query === 'string') {
+    options = Object.assign({ query }, options);
+  } else {
+    options = query;
+  }
+
   const requestOptions = Object.keys(options).reduce((result, key) => {
     if (NON_VARIABLE_OPTIONS.includes(key)) {
       result[key] = options[key];
-      return result;
+      return result
     }
 
     if (!result.variables) {
@@ -2533,56 +5990,52 @@ function graphql(request, query, options) {
     }
 
     result.variables[key] = options[key];
-    return result;
+    return result
   }, {});
-  return request(requestOptions).then(response => {
-    if (response.data.errors) {
-      throw new GraphqlError(requestOptions, {
-        data: response.data
-      });
-    }
 
-    return response.data.data;
-  });
+  return request(requestOptions)
+    .then(response => {
+      if (response.data.errors) {
+        throw new error(requestOptions, response)
+      }
+
+      return response.data.data
+    })
 }
 
-function withDefaults(request$1, newDefaults) {
-  const newRequest = request$1.defaults(newDefaults);
+var withDefaults_1 = withDefaults$1;
 
-  const newApi = (query, options) => {
-    return graphql(newRequest, query, options);
+
+
+function withDefaults$1 (request, newDefaults) {
+  const newRequest = request.defaults(newDefaults);
+  const newApi = function (query, options) {
+    return graphql_1(newRequest, query, options)
   };
 
-  return Object.assign(newApi, {
-    defaults: withDefaults.bind(null, newRequest),
-    endpoint: distNode$2.request.endpoint
-  });
+  newApi.defaults = withDefaults$1.bind(null, newRequest);
+  return newApi
 }
 
-const graphql$1 = withDefaults(distNode$2.request, {
+var require$$1$1 = getCjsExportFromNamespace(_package$1);
+
+const { request } = distNode;
+
+
+const version$1 = require$$1$1.version;
+const userAgent$1 = `octokit-graphql.js/${version$1} ${universalUserAgent()}`;
+
+
+
+var graphql$1 = withDefaults_1(request, {
+  method: 'POST',
+  url: '/graphql',
   headers: {
-    "user-agent": `octokit-graphql.js/${VERSION} ${distWeb.getUserAgent()}`
-  },
-  method: "POST",
-  url: "/graphql"
-});
-function withCustomRequest(customRequest) {
-  return withDefaults(customRequest, {
-    method: "POST",
-    url: "/graphql"
-  });
-}
-
-exports.graphql = graphql$1;
-exports.withCustomRequest = withCustomRequest;
-
+    'user-agent': userAgent$1
+  }
 });
 
-unwrapExports(distNode$3);
-var distNode_1$3 = distNode$3.graphql;
-var distNode_2 = distNode$3.withCustomRequest;
-
-const VERSION = "1.0.0";
+const VERSION$1 = "1.0.0";
 
 /**
  * @param octokit Octokit instance
@@ -2606,9 +6059,9 @@ function requestLog(octokit) {
         });
     });
 }
-requestLog.VERSION = VERSION;
+requestLog.VERSION = VERSION$1;
 
-var distWeb$2 = /*#__PURE__*/Object.freeze({
+var distWeb$4 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   requestLog: requestLog
 });
@@ -2628,7 +6081,7 @@ var endpointsByScope = {
             method: "PUT",
             params: {
                 encrypted_value: { type: "string" },
-                key_id: { type: "integer" },
+                key_id: { type: "string" },
                 name: { required: true, type: "string" },
                 owner: { required: true, type: "string" },
                 repo: { required: true, type: "string" }
@@ -2743,6 +6196,14 @@ var endpointsByScope = {
             },
             url: "/repos/:owner/:repo/actions/runs/:run_id"
         },
+        listDownloadsForSelfHostedRunnerApplication: {
+            method: "GET",
+            params: {
+                owner: { required: true, type: "string" },
+                repo: { required: true, type: "string" }
+            },
+            url: "/repos/:owner/:repo/actions/runners/downloads"
+        },
         listJobsForWorkflowRun: {
             method: "GET",
             params: {
@@ -2757,10 +6218,14 @@ var endpointsByScope = {
         listRepoWorkflowRuns: {
             method: "GET",
             params: {
+                actor: { type: "string" },
+                branch: { type: "string" },
+                event: { type: "string" },
                 owner: { required: true, type: "string" },
                 page: { type: "integer" },
                 per_page: { type: "integer" },
-                repo: { required: true, type: "string" }
+                repo: { required: true, type: "string" },
+                status: { enum: ["completed", "status", "conclusion"], type: "string" }
             },
             url: "/repos/:owner/:repo/actions/runs"
         },
@@ -2830,10 +6295,14 @@ var endpointsByScope = {
         listWorkflowRuns: {
             method: "GET",
             params: {
+                actor: { type: "string" },
+                branch: { type: "string" },
+                event: { type: "string" },
                 owner: { required: true, type: "string" },
                 page: { type: "integer" },
                 per_page: { type: "integer" },
                 repo: { required: true, type: "string" },
+                status: { enum: ["completed", "status", "conclusion"], type: "string" },
                 workflow_id: { required: true, type: "integer" }
             },
             url: "/repos/:owner/:repo/actions/workflows/:workflow_id/runs"
@@ -3125,20 +6594,12 @@ var endpointsByScope = {
         },
         checkAccountIsAssociatedWithAny: {
             method: "GET",
-            params: {
-                account_id: { required: true, type: "integer" },
-                page: { type: "integer" },
-                per_page: { type: "integer" }
-            },
+            params: { account_id: { required: true, type: "integer" } },
             url: "/marketplace_listing/accounts/:account_id"
         },
         checkAccountIsAssociatedWithAnyStubbed: {
             method: "GET",
-            params: {
-                account_id: { required: true, type: "integer" },
-                page: { type: "integer" },
-                per_page: { type: "integer" }
-            },
+            params: { account_id: { required: true, type: "integer" } },
             url: "/marketplace_listing/stubbed/accounts/:account_id"
         },
         checkAuthorization: {
@@ -4156,8 +7617,6 @@ var endpointsByScope = {
             params: {
                 comment_id: { required: true, type: "integer" },
                 owner: { required: true, type: "string" },
-                page: { type: "integer" },
-                per_page: { type: "integer" },
                 repo: { required: true, type: "string" }
             },
             url: "/repos/:owner/:repo/issues/comments/:comment_id"
@@ -5027,7 +8486,7 @@ var endpointsByScope = {
             params: {
                 page: { type: "integer" },
                 per_page: { type: "integer" },
-                since: { type: "string" }
+                since: { type: "integer" }
             },
             url: "/organizations"
         },
@@ -5308,11 +8767,7 @@ var endpointsByScope = {
         get: {
             headers: { accept: "application/vnd.github.inertia-preview+json" },
             method: "GET",
-            params: {
-                page: { type: "integer" },
-                per_page: { type: "integer" },
-                project_id: { required: true, type: "integer" }
-            },
+            params: { project_id: { required: true, type: "integer" } },
             url: "/projects/:project_id"
         },
         getCard: {
@@ -7508,7 +10963,7 @@ var endpointsByScope = {
             params: {
                 page: { type: "integer" },
                 per_page: { type: "integer" },
-                since: { type: "string" }
+                since: { type: "integer" }
             },
             url: "/repositories"
         },
@@ -8011,7 +11466,8 @@ var endpointsByScope = {
         uploadReleaseAsset: {
             method: "POST",
             params: {
-                file: { mapTo: "data", required: true, type: "string | object" },
+                data: { mapTo: "data", required: true, type: "string | object" },
+                file: { alias: "data", deprecated: true, type: "string | object" },
                 headers: { required: true, type: "object" },
                 "headers.content-length": { required: true, type: "integer" },
                 "headers.content-type": { required: true, type: "string" },
@@ -9235,7 +12691,7 @@ var endpointsByScope = {
     }
 };
 
-const VERSION$1 = "2.1.0";
+const VERSION$2 = "2.4.0";
 
 function registerEndpoints(octokit, routes) {
     Object.keys(routes).forEach(namespaceName => {
@@ -9310,19 +12766,29 @@ function patchForDeprecation(octokit, apiOptions, method, methodName) {
 function restEndpointMethods(octokit) {
     // @ts-ignore
     octokit.registerEndpoints = registerEndpoints.bind(null, octokit);
+    registerEndpoints(octokit, endpointsByScope);
     // Aliasing scopes for backward compatibility
     // See https://github.com/octokit/rest.js/pull/1134
-    // @ts-ignore
-    registerEndpoints(octokit, Object.assign(endpointsByScope, {
-        gitdata: endpointsByScope.git,
-        authorization: endpointsByScope.oauthAuthorizations,
-        pullRequests: endpointsByScope.pulls
-    }));
+    [
+        ["gitdata", "git"],
+        ["authorization", "oauthAuthorizations"],
+        ["pullRequests", "pulls"]
+    ].forEach(([deprecatedScope, scope]) => {
+        Object.defineProperty(octokit, deprecatedScope, {
+            get() {
+                octokit.log.warn(
+                // @ts-ignore
+                new Deprecation(`[@octokit/plugin-rest-endpoint-methods] "octokit.${deprecatedScope}.*" methods are deprecated, use "octokit.${scope}.*" instead`));
+                // @ts-ignore
+                return octokit[scope];
+            }
+        });
+    });
     return {};
 }
-restEndpointMethods.VERSION = VERSION$1;
+restEndpointMethods.VERSION = VERSION$2;
 
-var distWeb$3 = /*#__PURE__*/Object.freeze({
+var distWeb$5 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   restEndpointMethods: restEndpointMethods
 });
@@ -9478,19 +12944,19 @@ beforeAfterHook.Hook = Hook_1;
 beforeAfterHook.Singular = Singular;
 beforeAfterHook.Collection = Collection;
 
-var name = "@octokit/rest";
-var version = "16.39.0";
-var publishConfig = {
+var name$1 = "@octokit/rest";
+var version$2 = "16.43.1";
+var publishConfig$1 = {
 	access: "public"
 };
-var description = "GitHub REST API client for Node.js";
-var keywords = [
+var description$1 = "GitHub REST API client for Node.js";
+var keywords$1 = [
 	"octokit",
 	"github",
 	"rest",
 	"api-client"
 ];
-var author = "Gregor Martynus (https://github.com/gr2m)";
+var author$1 = "Gregor Martynus (https://github.com/gr2m)";
 var contributors = [
 	{
 		name: "Mike de Boer",
@@ -9509,12 +12975,12 @@ var contributors = [
 		url: "https://github.com/gr2m"
 	}
 ];
-var repository = "https://github.com/octokit/rest.js";
-var dependencies = {
+var repository$1 = "https://github.com/octokit/rest.js";
+var dependencies$1 = {
 	"@octokit/auth-token": "^2.4.0",
 	"@octokit/plugin-paginate-rest": "^1.1.1",
 	"@octokit/plugin-request-log": "^1.0.0",
-	"@octokit/plugin-rest-endpoint-methods": "^2.0.1",
+	"@octokit/plugin-rest-endpoint-methods": "2.4.0",
 	"@octokit/request": "^5.2.0",
 	"@octokit/request-error": "^1.0.2",
 	"atob-lite": "^2.0.0",
@@ -9528,7 +12994,7 @@ var dependencies = {
 	once: "^1.4.0",
 	"universal-user-agent": "^4.0.0"
 };
-var devDependencies = {
+var devDependencies$1 = {
 	"@gimenete/type-writer": "^0.1.3",
 	"@octokit/auth": "^1.1.1",
 	"@octokit/fixtures-server": "^5.0.6",
@@ -9543,6 +13009,7 @@ var devDependencies = {
 	"lodash.camelcase": "^4.3.0",
 	"lodash.merge": "^4.6.1",
 	"lodash.upperfirst": "^4.3.1",
+	lolex: "^5.1.2",
 	mkdirp: "^1.0.0",
 	mocha: "^7.0.1",
 	mustache: "^4.0.0",
@@ -9551,7 +13018,7 @@ var devDependencies = {
 	nyc: "^15.0.0",
 	prettier: "^1.14.2",
 	proxy: "^1.0.0",
-	"semantic-release": "^16.0.0",
+	"semantic-release": "^17.0.0",
 	sinon: "^8.0.0",
 	"sinon-chai": "^3.0.0",
 	"sort-keys": "^4.0.0",
@@ -9563,7 +13030,7 @@ var devDependencies = {
 	"webpack-cli": "^3.0.0"
 };
 var types = "index.d.ts";
-var scripts = {
+var scripts$1 = {
 	coverage: "nyc report --reporter=html && open coverage/index.html",
 	lint: "prettier --check '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json",
 	"lint:fix": "prettier --write '{lib,plugins,scripts,test}/**/*.{js,json,ts}' 'docs/*.{js,json}' 'docs/src/**/*' index.js README.md package.json",
@@ -9585,8 +13052,8 @@ var scripts = {
 	"postvalidate:ts": "tsc --noEmit --target es6 test/typescript-validate.ts",
 	"start-fixtures-server": "octokit-fixtures-server"
 };
-var license = "MIT";
-var files = [
+var license$1 = "MIT";
+var files$1 = [
 	"index.js",
 	"index.d.ts",
 	"lib",
@@ -9597,7 +13064,7 @@ var nyc = {
 		"test"
 	]
 };
-var release = {
+var release$1 = {
 	publish: [
 		"@semantic-release/npm",
 		{
@@ -9609,59 +13076,59 @@ var release = {
 		}
 	]
 };
-var bundlesize = [
+var bundlesize$1 = [
 	{
 		path: "./dist/octokit-rest.min.js.gz",
 		maxSize: "33 kB"
 	}
 ];
-var _package = {
-	name: name,
-	version: version,
-	publishConfig: publishConfig,
-	description: description,
-	keywords: keywords,
-	author: author,
+var _package$2 = {
+	name: name$1,
+	version: version$2,
+	publishConfig: publishConfig$1,
+	description: description$1,
+	keywords: keywords$1,
+	author: author$1,
 	contributors: contributors,
-	repository: repository,
-	dependencies: dependencies,
-	devDependencies: devDependencies,
+	repository: repository$1,
+	dependencies: dependencies$1,
+	devDependencies: devDependencies$1,
 	types: types,
-	scripts: scripts,
-	license: license,
-	files: files,
+	scripts: scripts$1,
+	license: license$1,
+	files: files$1,
 	nyc: nyc,
-	release: release,
-	bundlesize: bundlesize
+	release: release$1,
+	bundlesize: bundlesize$1
 };
 
-var _package$1 = /*#__PURE__*/Object.freeze({
+var _package$3 = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  name: name,
-  version: version,
-  publishConfig: publishConfig,
-  description: description,
-  keywords: keywords,
-  author: author,
+  name: name$1,
+  version: version$2,
+  publishConfig: publishConfig$1,
+  description: description$1,
+  keywords: keywords$1,
+  author: author$1,
   contributors: contributors,
-  repository: repository,
-  dependencies: dependencies,
-  devDependencies: devDependencies,
+  repository: repository$1,
+  dependencies: dependencies$1,
+  devDependencies: devDependencies$1,
   types: types,
-  scripts: scripts,
-  license: license,
-  files: files,
+  scripts: scripts$1,
+  license: license$1,
+  files: files$1,
   nyc: nyc,
-  release: release,
-  bundlesize: bundlesize,
-  'default': _package
+  release: release$1,
+  bundlesize: bundlesize$1,
+  'default': _package$2
 });
 
-var pkg = getCjsExportFromNamespace(_package$1);
+var pkg = getCjsExportFromNamespace(_package$3);
 
 var parseClientOptions = parseOptions;
 
-const { Deprecation: Deprecation$1 } = distWeb$1;
+const { Deprecation: Deprecation$1 } = distWeb$2;
 const { getUserAgent: getUserAgent$1 } = distWeb;
 
 
@@ -9751,7 +13218,7 @@ function parseOptions(options, log, hook) {
 
 var constructor_1 = Octokit;
 
-const { request } = distNode$2;
+const { request: request$1 } = distNode;
 
 
 
@@ -9771,7 +13238,7 @@ function Octokit(plugins, options) {
   const api = {
     hook,
     log,
-    request: request.defaults(parseClientOptions(options, log, hook))
+    request: request$1.defaults(parseClientOptions(options, log, hook))
   };
 
   plugins.forEach(pluginFunction => pluginFunction(api, options));
@@ -9800,7 +13267,7 @@ function factory(plugins) {
   return Api;
 }
 
-var core = factory_1();
+var core$1 = factory_1();
 
 async function auth(token) {
     const tokenType = token.split(/\./).length === 3
@@ -9846,7 +13313,7 @@ const createTokenAuth = function createTokenAuth(token) {
     });
 };
 
-var distWeb$4 = /*#__PURE__*/Object.freeze({
+var distWeb$6 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   createTokenAuth: createTokenAuth
 });
@@ -9939,7 +13406,7 @@ function authenticationBeforeRequest(state, options) {
 
 var requestError = authenticationRequestError;
 
-const { RequestError } = distNode$1;
+const { RequestError: RequestError$1 } = distWeb$3;
 
 function authenticationRequestError(state, error, options) {
   if (!error.headers) throw error;
@@ -9959,7 +13426,7 @@ function authenticationRequestError(state, error, options) {
     if (state.otp) {
       delete state.otp; // no longer valid, request again
     } else {
-      throw new RequestError(
+      throw new RequestError$1(
         "Invalid one-time password for two-factor authentication",
         401,
         {
@@ -9971,7 +13438,7 @@ function authenticationRequestError(state, error, options) {
   }
 
   if (typeof state.auth.on2fa !== "function") {
-    throw new RequestError(
+    throw new RequestError$1(
       "2FA required, but options.on2fa is not a function. See https://github.com/octokit/rest.js#authentication",
       401,
       {
@@ -10023,8 +13490,8 @@ function validateAuth(auth) {
 
 var authentication = authenticationPlugin;
 
-const { createTokenAuth: createTokenAuth$1 } = distWeb$4;
-const { Deprecation: Deprecation$2 } = distWeb$1;
+const { createTokenAuth: createTokenAuth$1 } = distWeb$6;
+const { Deprecation: Deprecation$2 } = distWeb$2;
 
 
 
@@ -10100,7 +13567,7 @@ function authenticationPlugin(octokit, options) {
 
 var authenticate_1 = authenticate;
 
-const { Deprecation: Deprecation$3 } = distWeb$1;
+const { Deprecation: Deprecation$3 } = distWeb$2;
 
 
 const deprecateAuthenticate = once_1((log, deprecation) => log.warn(deprecation));
@@ -10381,7 +13848,7 @@ var reIsNative = RegExp('^' +
 var splice = arrayProto.splice;
 
 /* Built-in method references that are verified to be native. */
-var Map = getNative(root, 'Map'),
+var Map$1 = getNative(root, 'Map'),
     Set = getNative(root, 'Set'),
     nativeCreate = getNative(Object, 'create');
 
@@ -10623,7 +14090,7 @@ function MapCache(entries) {
 function mapCacheClear() {
   this.__data__ = {
     'hash': new Hash,
-    'map': new (Map || ListCache),
+    'map': new (Map$1 || ListCache),
     'string': new Hash
   };
 }
@@ -10841,7 +14308,7 @@ function baseUniq(array, iteratee, comparator) {
  * @param {Array} values The values to add to the set.
  * @returns {Object} Returns the new set.
  */
-var createSet = !(Set && (1 / setToArray(new Set([,-0]))[1]) == INFINITY) ? noop : function(values) {
+var createSet = !(Set && (1 / setToArray(new Set([,-0]))[1]) == INFINITY) ? noop$2 : function(values) {
   return new Set(values);
 };
 
@@ -11042,7 +14509,7 @@ function isObject$2(value) {
  * _.times(2, _.noop);
  * // => [undefined, undefined]
  */
-function noop() {
+function noop$2() {
   // No operation performed.
 }
 
@@ -11094,7 +14561,7 @@ function authenticationBeforeRequest$1(state, options) {
 
 var requestError$1 = authenticationRequestError$1;
 
-const { RequestError: RequestError$1 } = distNode$1;
+const { RequestError: RequestError$2 } = distWeb$3;
 
 function authenticationRequestError$1(state, error, options) {
   /* istanbul ignore next */
@@ -11112,7 +14579,7 @@ function authenticationRequestError$1(state, error, options) {
     error.request &&
     error.request.headers["x-github-otp"]
   ) {
-    throw new RequestError$1(
+    throw new RequestError$2(
       "Invalid one-time password for two-factor authentication",
       401,
       {
@@ -11123,7 +14590,7 @@ function authenticationRequestError$1(state, error, options) {
   }
 
   if (typeof state.auth.on2fa !== "function") {
-    throw new RequestError$1(
+    throw new RequestError$2(
       "2FA required, but options.on2fa is not a function. See https://github.com/octokit/rest.js#authentication",
       401,
       {
@@ -11150,7 +14617,7 @@ function authenticationRequestError$1(state, error, options) {
 
 var authenticationDeprecated = authenticationPlugin$1;
 
-const { Deprecation: Deprecation$4 } = distWeb$1;
+const { Deprecation: Deprecation$4 } = distWeb$2;
 
 
 const deprecateAuthenticate$1 = once_1((log, deprecation) => log.warn(deprecation));
@@ -11180,7 +14647,7 @@ function authenticationPlugin$1(octokit, options) {
   octokit.hook.error("request", requestError$1.bind(null, state));
 }
 
-const VERSION$2 = "1.1.1";
+const VERSION$3 = "1.1.2";
 
 /**
  * Some “list” response that can be paginated have a different response structure
@@ -11202,18 +14669,20 @@ const VERSION$2 = "1.1.1";
  * paths has to be added in order to normalize the response. We cannot check for the total_count
  * property because it also exists in the response of Get the combined status for a specific ref.
  */
-const REGEX_IS_SEARCH_PATH = /^\/search\//;
-const REGEX_IS_CHECKS_PATH = /^\/repos\/[^/]+\/[^/]+\/commits\/[^/]+\/(check-runs|check-suites)/;
-const REGEX_IS_INSTALLATION_REPOSITORIES_PATH = /^\/installation\/repositories/;
-const REGEX_IS_USER_INSTALLATIONS_PATH = /^\/user\/installations/;
+const REGEX = [
+    /^\/search\//,
+    /^\/repos\/[^/]+\/[^/]+\/commits\/[^/]+\/(check-runs|check-suites)([^/]|$)/,
+    /^\/installation\/repositories([^/]|$)/,
+    /^\/user\/installations([^/]|$)/,
+    /^\/repos\/[^/]+\/[^/]+\/actions\/secrets([^/]|$)/,
+    /^\/repos\/[^/]+\/[^/]+\/actions\/workflows(\/[^/]+\/runs)?([^/]|$)/,
+    /^\/repos\/[^/]+\/[^/]+\/actions\/runs(\/[^/]+\/(artifacts|jobs))?([^/]|$)/
+];
 function normalizePaginatedListResponse(octokit, url, response) {
     const path = url.replace(octokit.request.endpoint.DEFAULTS.baseUrl, "");
-    if (!REGEX_IS_SEARCH_PATH.test(path) &&
-        !REGEX_IS_CHECKS_PATH.test(path) &&
-        !REGEX_IS_INSTALLATION_REPOSITORIES_PATH.test(path) &&
-        !REGEX_IS_USER_INSTALLATIONS_PATH.test(path)) {
+    const responseNeedsNormalization = REGEX.find(regex => regex.test(path));
+    if (!responseNeedsNormalization)
         return;
-    }
     // keep the additional properties intact as there is currently no other way
     // to retrieve the same information.
     const incompleteResults = response.data.incomplete_results;
@@ -11301,16 +14770,16 @@ function paginateRest(octokit) {
         })
     };
 }
-paginateRest.VERSION = VERSION$2;
+paginateRest.VERSION = VERSION$3;
 
-var distWeb$5 = /*#__PURE__*/Object.freeze({
+var distWeb$7 = /*#__PURE__*/Object.freeze({
   __proto__: null,
   paginateRest: paginateRest
 });
 
 var pagination = paginatePlugin;
 
-const { paginateRest: paginateRest$1 } = distWeb$5;
+const { paginateRest: paginateRest$1 } = distWeb$7;
 
 function paginatePlugin(octokit) {
   Object.assign(octokit, paginateRest$1(octokit));
@@ -11435,7 +14904,7 @@ var Symbol$1 = root$1.Symbol,
     splice$1 = arrayProto$1.splice;
 
 /* Built-in method references that are verified to be native. */
-var Map$1 = getNative$1(root$1, 'Map'),
+var Map$2 = getNative$1(root$1, 'Map'),
     nativeCreate$1 = getNative$1(Object, 'create');
 
 /** Used to convert symbols to primitives and strings. */
@@ -11680,7 +15149,7 @@ function MapCache$1(entries) {
 function mapCacheClear$1() {
   this.__data__ = {
     'hash': new Hash$1,
-    'map': new (Map$1 || ListCache$1),
+    'map': new (Map$2 || ListCache$1),
     'string': new Hash$1
   };
 }
@@ -12371,7 +15840,7 @@ var Symbol$2 = root$2.Symbol,
     splice$2 = arrayProto$2.splice;
 
 /* Built-in method references that are verified to be native. */
-var Map$2 = getNative$2(root$2, 'Map'),
+var Map$3 = getNative$2(root$2, 'Map'),
     nativeCreate$2 = getNative$2(Object, 'create');
 
 /** Used to convert symbols to primitives and strings. */
@@ -12616,7 +16085,7 @@ function MapCache$2(entries) {
 function mapCacheClear$2() {
   this.__data__ = {
     'hash': new Hash$2,
-    'map': new (Map$2 || ListCache$2),
+    'map': new (Map$3 || ListCache$2),
     'string': new Hash$2
   };
 }
@@ -13241,7 +16710,7 @@ var lodash_set = set;
 
 var validate_1 = validate$1;
 
-const { RequestError: RequestError$2 } = distNode$1;
+const { RequestError: RequestError$3 } = distWeb$3;
 
 
 
@@ -13300,7 +16769,7 @@ function validate$1(octokit, options) {
       }
 
       if (!parameter.allowNull && valueIsNull) {
-        throw new RequestError$2(
+        throw new RequestError$3(
           `'${currentParameterName}' cannot be null`,
           400,
           {
@@ -13310,7 +16779,7 @@ function validate$1(octokit, options) {
       }
 
       if (parameter.required && !valueIsPresent) {
-        throw new RequestError$2(
+        throw new RequestError$3(
           `Empty value for parameter '${currentParameterName}': ${JSON.stringify(
             value
           )}`,
@@ -13327,7 +16796,7 @@ function validate$1(octokit, options) {
         const unparsedValue = value;
         value = parseInt(value, 10);
         if (isNaN(value)) {
-          throw new RequestError$2(
+          throw new RequestError$3(
             `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
               unparsedValue
             )} is NaN`,
@@ -13340,7 +16809,7 @@ function validate$1(octokit, options) {
       }
 
       if (parameter.enum && parameter.enum.indexOf(String(value)) === -1) {
-        throw new RequestError$2(
+        throw new RequestError$3(
           `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
             value
           )}`,
@@ -13354,7 +16823,7 @@ function validate$1(octokit, options) {
       if (parameter.validation) {
         const regex = new RegExp(parameter.validation);
         if (!regex.test(value)) {
-          throw new RequestError$2(
+          throw new RequestError$3(
             `Invalid value for parameter '${currentParameterName}': ${JSON.stringify(
               value
             )}`,
@@ -13370,7 +16839,7 @@ function validate$1(octokit, options) {
         try {
           value = JSON.parse(value);
         } catch (exception) {
-          throw new RequestError$2(
+          throw new RequestError$3(
             `JSON parse error of value for parameter '${currentParameterName}': ${JSON.stringify(
               value
             )}`,
@@ -13566,10 +17035,10 @@ function paginationMethodsPlugin (octokit) {
   octokit.hasPreviousPage = hasPreviousPage_1;
 }
 
-const { requestLog: requestLog$1 } = distWeb$2;
+const { requestLog: requestLog$1 } = distWeb$4;
 const {
   restEndpointMethods: restEndpointMethods$1
-} = distWeb$3;
+} = distWeb$5;
 
 
 
@@ -13584,7 +17053,31 @@ const CORE_PLUGINS = [
   octokitPaginationMethods // deprecated: remove in v17
 ];
 
-var rest = core.plugin(CORE_PLUGINS);
+const OctokitRest = core$1.plugin(CORE_PLUGINS);
+
+function DeprecatedOctokit(options) {
+  const warn =
+    options && options.log && options.log.warn
+      ? options.log.warn
+      : console.warn;
+  warn(
+    '[@octokit/rest] `const Octokit = require("@octokit/rest")` is deprecated. Use `const { Octokit } = require("@octokit/rest")` instead'
+  );
+  return new OctokitRest(options);
+}
+
+const Octokit$1 = Object.assign(DeprecatedOctokit, {
+  Octokit: OctokitRest
+});
+
+Object.keys(OctokitRest).forEach(key => {
+  /* istanbul ignore else */
+  if (OctokitRest.hasOwnProperty(key)) {
+    Octokit$1[key] = OctokitRest[key];
+  }
+});
+
+var rest = Octokit$1;
 
 var context = createCommonjsModule(function (module, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -13601,8 +17094,7 @@ class Context {
                 this.payload = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, { encoding: 'utf8' }));
             }
             else {
-                const path = process.env.GITHUB_EVENT_PATH;
-                process.stdout.write(`GITHUB_EVENT_PATH ${path} does not exist${os.EOL}`);
+                process.stdout.write(`GITHUB_EVENT_PATH ${process.env.GITHUB_EVENT_PATH} does not exist${os.EOL}`);
             }
         }
         this.eventName = process.env.GITHUB_EVENT_NAME;
@@ -13614,7 +17106,7 @@ class Context {
     }
     get issue() {
         const payload = this.payload;
-        return Object.assign(Object.assign({}, this.repo), { number: (payload.issue || payload.pull_request || payload).number });
+        return Object.assign(Object.assign({}, this.repo), { number: (payload.issue || payload.pullRequest || payload).number });
     }
     get repo() {
         if (process.env.GITHUB_REPOSITORY) {
@@ -13637,728 +17129,6 @@ exports.Context = Context;
 unwrapExports(context);
 var context_1 = context.Context;
 
-var proxy = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-
-function getProxyUrl(reqUrl) {
-    let usingSsl = reqUrl.protocol === 'https:';
-    let proxyUrl;
-    if (checkBypass(reqUrl)) {
-        return proxyUrl;
-    }
-    let proxyVar;
-    if (usingSsl) {
-        proxyVar = process.env["https_proxy"] ||
-            process.env["HTTPS_PROXY"];
-    }
-    else {
-        proxyVar = process.env["http_proxy"] ||
-            process.env["HTTP_PROXY"];
-    }
-    if (proxyVar) {
-        proxyUrl = Url.parse(proxyVar);
-    }
-    return proxyUrl;
-}
-exports.getProxyUrl = getProxyUrl;
-function checkBypass(reqUrl) {
-    if (!reqUrl.hostname) {
-        return false;
-    }
-    let noProxy = process.env["no_proxy"] || process.env["NO_PROXY"] || '';
-    if (!noProxy) {
-        return false;
-    }
-    // Determine the request port
-    let reqPort;
-    if (reqUrl.port) {
-        reqPort = Number(reqUrl.port);
-    }
-    else if (reqUrl.protocol === 'http:') {
-        reqPort = 80;
-    }
-    else if (reqUrl.protocol === 'https:') {
-        reqPort = 443;
-    }
-    // Format the request hostname and hostname with port
-    let upperReqHosts = [reqUrl.hostname.toUpperCase()];
-    if (typeof reqPort === 'number') {
-        upperReqHosts.push(`${upperReqHosts[0]}:${reqPort}`);
-    }
-    // Compare request host against noproxy
-    for (let upperNoProxyItem of noProxy.split(',').map(x => x.trim().toUpperCase()).filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
-            return true;
-        }
-    }
-    return false;
-}
-exports.checkBypass = checkBypass;
-});
-
-unwrapExports(proxy);
-var proxy_1 = proxy.getProxyUrl;
-var proxy_2 = proxy.checkBypass;
-
-var httpOverHttp_1 = httpOverHttp;
-var httpsOverHttp_1 = httpsOverHttp;
-var httpOverHttps_1 = httpOverHttps;
-var httpsOverHttps_1 = httpsOverHttps;
-
-
-function httpOverHttp(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = http.request;
-  return agent;
-}
-
-function httpsOverHttp(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = http.request;
-  agent.createSocket = createSecureSocket;
-  agent.defaultPort = 443;
-  return agent;
-}
-
-function httpOverHttps(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = https.request;
-  return agent;
-}
-
-function httpsOverHttps(options) {
-  var agent = new TunnelingAgent(options);
-  agent.request = https.request;
-  agent.createSocket = createSecureSocket;
-  agent.defaultPort = 443;
-  return agent;
-}
-
-
-function TunnelingAgent(options) {
-  var self = this;
-  self.options = options || {};
-  self.proxyOptions = self.options.proxy || {};
-  self.maxSockets = self.options.maxSockets || http.Agent.defaultMaxSockets;
-  self.requests = [];
-  self.sockets = [];
-
-  self.on('free', function onFree(socket, host, port, localAddress) {
-    var options = toOptions(host, port, localAddress);
-    for (var i = 0, len = self.requests.length; i < len; ++i) {
-      var pending = self.requests[i];
-      if (pending.host === options.host && pending.port === options.port) {
-        // Detect the request to connect same origin server,
-        // reuse the connection.
-        self.requests.splice(i, 1);
-        pending.request.onSocket(socket);
-        return;
-      }
-    }
-    socket.destroy();
-    self.removeSocket(socket);
-  });
-}
-util.inherits(TunnelingAgent, events.EventEmitter);
-
-TunnelingAgent.prototype.addRequest = function addRequest(req, host, port, localAddress) {
-  var self = this;
-  var options = mergeOptions({request: req}, self.options, toOptions(host, port, localAddress));
-
-  if (self.sockets.length >= this.maxSockets) {
-    // We are over limit so we'll add it to the queue.
-    self.requests.push(options);
-    return;
-  }
-
-  // If we are under maxSockets create a new one.
-  self.createSocket(options, function(socket) {
-    socket.on('free', onFree);
-    socket.on('close', onCloseOrRemove);
-    socket.on('agentRemove', onCloseOrRemove);
-    req.onSocket(socket);
-
-    function onFree() {
-      self.emit('free', socket, options);
-    }
-
-    function onCloseOrRemove(err) {
-      self.removeSocket(socket);
-      socket.removeListener('free', onFree);
-      socket.removeListener('close', onCloseOrRemove);
-      socket.removeListener('agentRemove', onCloseOrRemove);
-    }
-  });
-};
-
-TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
-  var self = this;
-  var placeholder = {};
-  self.sockets.push(placeholder);
-
-  var connectOptions = mergeOptions({}, self.proxyOptions, {
-    method: 'CONNECT',
-    path: options.host + ':' + options.port,
-    agent: false,
-    headers: {
-      host: options.host + ':' + options.port
-    }
-  });
-  if (options.localAddress) {
-    connectOptions.localAddress = options.localAddress;
-  }
-  if (connectOptions.proxyAuth) {
-    connectOptions.headers = connectOptions.headers || {};
-    connectOptions.headers['Proxy-Authorization'] = 'Basic ' +
-        new Buffer(connectOptions.proxyAuth).toString('base64');
-  }
-
-  debug('making CONNECT request');
-  var connectReq = self.request(connectOptions);
-  connectReq.useChunkedEncodingByDefault = false; // for v0.6
-  connectReq.once('response', onResponse); // for v0.6
-  connectReq.once('upgrade', onUpgrade);   // for v0.6
-  connectReq.once('connect', onConnect);   // for v0.7 or later
-  connectReq.once('error', onError);
-  connectReq.end();
-
-  function onResponse(res) {
-    // Very hacky. This is necessary to avoid http-parser leaks.
-    res.upgrade = true;
-  }
-
-  function onUpgrade(res, socket, head) {
-    // Hacky.
-    process.nextTick(function() {
-      onConnect(res, socket, head);
-    });
-  }
-
-  function onConnect(res, socket, head) {
-    connectReq.removeAllListeners();
-    socket.removeAllListeners();
-
-    if (res.statusCode !== 200) {
-      debug('tunneling socket could not be established, statusCode=%d',
-        res.statusCode);
-      socket.destroy();
-      var error = new Error('tunneling socket could not be established, ' +
-        'statusCode=' + res.statusCode);
-      error.code = 'ECONNRESET';
-      options.request.emit('error', error);
-      self.removeSocket(placeholder);
-      return;
-    }
-    if (head.length > 0) {
-      debug('got illegal response body from proxy');
-      socket.destroy();
-      var error = new Error('got illegal response body from proxy');
-      error.code = 'ECONNRESET';
-      options.request.emit('error', error);
-      self.removeSocket(placeholder);
-      return;
-    }
-    debug('tunneling connection has established');
-    self.sockets[self.sockets.indexOf(placeholder)] = socket;
-    return cb(socket);
-  }
-
-  function onError(cause) {
-    connectReq.removeAllListeners();
-
-    debug('tunneling socket could not be established, cause=%s\n',
-          cause.message, cause.stack);
-    var error = new Error('tunneling socket could not be established, ' +
-                          'cause=' + cause.message);
-    error.code = 'ECONNRESET';
-    options.request.emit('error', error);
-    self.removeSocket(placeholder);
-  }
-};
-
-TunnelingAgent.prototype.removeSocket = function removeSocket(socket) {
-  var pos = this.sockets.indexOf(socket);
-  if (pos === -1) {
-    return;
-  }
-  this.sockets.splice(pos, 1);
-
-  var pending = this.requests.shift();
-  if (pending) {
-    // If we have pending requests and a socket gets closed a new one
-    // needs to be created to take over in the pool for the one that closed.
-    this.createSocket(pending, function(socket) {
-      pending.request.onSocket(socket);
-    });
-  }
-};
-
-function createSecureSocket(options, cb) {
-  var self = this;
-  TunnelingAgent.prototype.createSocket.call(self, options, function(socket) {
-    var hostHeader = options.request.getHeader('host');
-    var tlsOptions = mergeOptions({}, self.options, {
-      socket: socket,
-      servername: hostHeader ? hostHeader.replace(/:.*$/, '') : options.host
-    });
-
-    // 0 is dummy port for v0.6
-    var secureSocket = tls.connect(0, tlsOptions);
-    self.sockets[self.sockets.indexOf(socket)] = secureSocket;
-    cb(secureSocket);
-  });
-}
-
-
-function toOptions(host, port, localAddress) {
-  if (typeof host === 'string') { // since v0.10
-    return {
-      host: host,
-      port: port,
-      localAddress: localAddress
-    };
-  }
-  return host; // for v0.11 or later
-}
-
-function mergeOptions(target) {
-  for (var i = 1, len = arguments.length; i < len; ++i) {
-    var overrides = arguments[i];
-    if (typeof overrides === 'object') {
-      var keys = Object.keys(overrides);
-      for (var j = 0, keyLen = keys.length; j < keyLen; ++j) {
-        var k = keys[j];
-        if (overrides[k] !== undefined) {
-          target[k] = overrides[k];
-        }
-      }
-    }
-  }
-  return target;
-}
-
-
-var debug;
-if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
-  debug = function() {
-    var args = Array.prototype.slice.call(arguments);
-    if (typeof args[0] === 'string') {
-      args[0] = 'TUNNEL: ' + args[0];
-    } else {
-      args.unshift('TUNNEL:');
-    }
-    console.error.apply(console, args);
-  };
-} else {
-  debug = function() {};
-}
-var debug_1 = debug; // for test
-
-var tunnel = {
-	httpOverHttp: httpOverHttp_1,
-	httpsOverHttp: httpsOverHttp_1,
-	httpOverHttps: httpOverHttps_1,
-	httpsOverHttps: httpsOverHttps_1,
-	debug: debug_1
-};
-
-var tunnel$1 = tunnel;
-
-var httpClient = createCommonjsModule(function (module, exports) {
-Object.defineProperty(exports, "__esModule", { value: true });
-
-
-
-
-let tunnel;
-var HttpCodes;
-(function (HttpCodes) {
-    HttpCodes[HttpCodes["OK"] = 200] = "OK";
-    HttpCodes[HttpCodes["MultipleChoices"] = 300] = "MultipleChoices";
-    HttpCodes[HttpCodes["MovedPermanently"] = 301] = "MovedPermanently";
-    HttpCodes[HttpCodes["ResourceMoved"] = 302] = "ResourceMoved";
-    HttpCodes[HttpCodes["SeeOther"] = 303] = "SeeOther";
-    HttpCodes[HttpCodes["NotModified"] = 304] = "NotModified";
-    HttpCodes[HttpCodes["UseProxy"] = 305] = "UseProxy";
-    HttpCodes[HttpCodes["SwitchProxy"] = 306] = "SwitchProxy";
-    HttpCodes[HttpCodes["TemporaryRedirect"] = 307] = "TemporaryRedirect";
-    HttpCodes[HttpCodes["PermanentRedirect"] = 308] = "PermanentRedirect";
-    HttpCodes[HttpCodes["BadRequest"] = 400] = "BadRequest";
-    HttpCodes[HttpCodes["Unauthorized"] = 401] = "Unauthorized";
-    HttpCodes[HttpCodes["PaymentRequired"] = 402] = "PaymentRequired";
-    HttpCodes[HttpCodes["Forbidden"] = 403] = "Forbidden";
-    HttpCodes[HttpCodes["NotFound"] = 404] = "NotFound";
-    HttpCodes[HttpCodes["MethodNotAllowed"] = 405] = "MethodNotAllowed";
-    HttpCodes[HttpCodes["NotAcceptable"] = 406] = "NotAcceptable";
-    HttpCodes[HttpCodes["ProxyAuthenticationRequired"] = 407] = "ProxyAuthenticationRequired";
-    HttpCodes[HttpCodes["RequestTimeout"] = 408] = "RequestTimeout";
-    HttpCodes[HttpCodes["Conflict"] = 409] = "Conflict";
-    HttpCodes[HttpCodes["Gone"] = 410] = "Gone";
-    HttpCodes[HttpCodes["InternalServerError"] = 500] = "InternalServerError";
-    HttpCodes[HttpCodes["NotImplemented"] = 501] = "NotImplemented";
-    HttpCodes[HttpCodes["BadGateway"] = 502] = "BadGateway";
-    HttpCodes[HttpCodes["ServiceUnavailable"] = 503] = "ServiceUnavailable";
-    HttpCodes[HttpCodes["GatewayTimeout"] = 504] = "GatewayTimeout";
-})(HttpCodes = exports.HttpCodes || (exports.HttpCodes = {}));
-/**
- * Returns the proxy URL, depending upon the supplied url and proxy environment variables.
- * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
- */
-function getProxyUrl(serverUrl) {
-    let proxyUrl = proxy.getProxyUrl(Url.parse(serverUrl));
-    return proxyUrl ? proxyUrl.href : '';
-}
-exports.getProxyUrl = getProxyUrl;
-const HttpRedirectCodes = [HttpCodes.MovedPermanently, HttpCodes.ResourceMoved, HttpCodes.SeeOther, HttpCodes.TemporaryRedirect, HttpCodes.PermanentRedirect];
-const HttpResponseRetryCodes = [HttpCodes.BadGateway, HttpCodes.ServiceUnavailable, HttpCodes.GatewayTimeout];
-const RetryableHttpVerbs = ['OPTIONS', 'GET', 'DELETE', 'HEAD'];
-const ExponentialBackoffCeiling = 10;
-const ExponentialBackoffTimeSlice = 5;
-class HttpClientResponse {
-    constructor(message) {
-        this.message = message;
-    }
-    readBody() {
-        return new Promise(async (resolve, reject) => {
-            let output = Buffer.alloc(0);
-            this.message.on('data', (chunk) => {
-                output = Buffer.concat([output, chunk]);
-            });
-            this.message.on('end', () => {
-                resolve(output.toString());
-            });
-        });
-    }
-}
-exports.HttpClientResponse = HttpClientResponse;
-function isHttps(requestUrl) {
-    let parsedUrl = Url.parse(requestUrl);
-    return parsedUrl.protocol === 'https:';
-}
-exports.isHttps = isHttps;
-class HttpClient {
-    constructor(userAgent, handlers, requestOptions) {
-        this._ignoreSslError = false;
-        this._allowRedirects = true;
-        this._allowRedirectDowngrade = false;
-        this._maxRedirects = 50;
-        this._allowRetries = false;
-        this._maxRetries = 1;
-        this._keepAlive = false;
-        this._disposed = false;
-        this.userAgent = userAgent;
-        this.handlers = handlers || [];
-        this.requestOptions = requestOptions;
-        if (requestOptions) {
-            if (requestOptions.ignoreSslError != null) {
-                this._ignoreSslError = requestOptions.ignoreSslError;
-            }
-            this._socketTimeout = requestOptions.socketTimeout;
-            if (requestOptions.allowRedirects != null) {
-                this._allowRedirects = requestOptions.allowRedirects;
-            }
-            if (requestOptions.allowRedirectDowngrade != null) {
-                this._allowRedirectDowngrade = requestOptions.allowRedirectDowngrade;
-            }
-            if (requestOptions.maxRedirects != null) {
-                this._maxRedirects = Math.max(requestOptions.maxRedirects, 0);
-            }
-            if (requestOptions.keepAlive != null) {
-                this._keepAlive = requestOptions.keepAlive;
-            }
-            if (requestOptions.allowRetries != null) {
-                this._allowRetries = requestOptions.allowRetries;
-            }
-            if (requestOptions.maxRetries != null) {
-                this._maxRetries = requestOptions.maxRetries;
-            }
-        }
-    }
-    options(requestUrl, additionalHeaders) {
-        return this.request('OPTIONS', requestUrl, null, additionalHeaders || {});
-    }
-    get(requestUrl, additionalHeaders) {
-        return this.request('GET', requestUrl, null, additionalHeaders || {});
-    }
-    del(requestUrl, additionalHeaders) {
-        return this.request('DELETE', requestUrl, null, additionalHeaders || {});
-    }
-    post(requestUrl, data, additionalHeaders) {
-        return this.request('POST', requestUrl, data, additionalHeaders || {});
-    }
-    patch(requestUrl, data, additionalHeaders) {
-        return this.request('PATCH', requestUrl, data, additionalHeaders || {});
-    }
-    put(requestUrl, data, additionalHeaders) {
-        return this.request('PUT', requestUrl, data, additionalHeaders || {});
-    }
-    head(requestUrl, additionalHeaders) {
-        return this.request('HEAD', requestUrl, null, additionalHeaders || {});
-    }
-    sendStream(verb, requestUrl, stream, additionalHeaders) {
-        return this.request(verb, requestUrl, stream, additionalHeaders);
-    }
-    /**
-     * Makes a raw http request.
-     * All other methods such as get, post, patch, and request ultimately call this.
-     * Prefer get, del, post and patch
-     */
-    async request(verb, requestUrl, data, headers) {
-        if (this._disposed) {
-            throw new Error("Client has already been disposed.");
-        }
-        let parsedUrl = Url.parse(requestUrl);
-        let info = this._prepareRequest(verb, parsedUrl, headers);
-        // Only perform retries on reads since writes may not be idempotent.
-        let maxTries = (this._allowRetries && RetryableHttpVerbs.indexOf(verb) != -1) ? this._maxRetries + 1 : 1;
-        let numTries = 0;
-        let response;
-        while (numTries < maxTries) {
-            response = await this.requestRaw(info, data);
-            // Check if it's an authentication challenge
-            if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
-                let authenticationHandler;
-                for (let i = 0; i < this.handlers.length; i++) {
-                    if (this.handlers[i].canHandleAuthentication(response)) {
-                        authenticationHandler = this.handlers[i];
-                        break;
-                    }
-                }
-                if (authenticationHandler) {
-                    return authenticationHandler.handleAuthentication(this, info, data);
-                }
-                else {
-                    // We have received an unauthorized response but have no handlers to handle it.
-                    // Let the response return to the caller.
-                    return response;
-                }
-            }
-            let redirectsRemaining = this._maxRedirects;
-            while (HttpRedirectCodes.indexOf(response.message.statusCode) != -1
-                && this._allowRedirects
-                && redirectsRemaining > 0) {
-                const redirectUrl = response.message.headers["location"];
-                if (!redirectUrl) {
-                    // if there's no location to redirect to, we won't
-                    break;
-                }
-                let parsedRedirectUrl = Url.parse(redirectUrl);
-                if (parsedUrl.protocol == 'https:' && parsedUrl.protocol != parsedRedirectUrl.protocol && !this._allowRedirectDowngrade) {
-                    throw new Error("Redirect from HTTPS to HTTP protocol. This downgrade is not allowed for security reasons. If you want to allow this behavior, set the allowRedirectDowngrade option to true.");
-                }
-                // we need to finish reading the response before reassigning response
-                // which will leak the open socket.
-                await response.readBody();
-                // let's make the request with the new redirectUrl
-                info = this._prepareRequest(verb, parsedRedirectUrl, headers);
-                response = await this.requestRaw(info, data);
-                redirectsRemaining--;
-            }
-            if (HttpResponseRetryCodes.indexOf(response.message.statusCode) == -1) {
-                // If not a retry code, return immediately instead of retrying
-                return response;
-            }
-            numTries += 1;
-            if (numTries < maxTries) {
-                await response.readBody();
-                await this._performExponentialBackoff(numTries);
-            }
-        }
-        return response;
-    }
-    /**
-     * Needs to be called if keepAlive is set to true in request options.
-     */
-    dispose() {
-        if (this._agent) {
-            this._agent.destroy();
-        }
-        this._disposed = true;
-    }
-    /**
-     * Raw request.
-     * @param info
-     * @param data
-     */
-    requestRaw(info, data) {
-        return new Promise((resolve, reject) => {
-            let callbackForResult = function (err, res) {
-                if (err) {
-                    reject(err);
-                }
-                resolve(res);
-            };
-            this.requestRawWithCallback(info, data, callbackForResult);
-        });
-    }
-    /**
-     * Raw request with callback.
-     * @param info
-     * @param data
-     * @param onResult
-     */
-    requestRawWithCallback(info, data, onResult) {
-        let socket;
-        if (typeof (data) === 'string') {
-            info.options.headers["Content-Length"] = Buffer.byteLength(data, 'utf8');
-        }
-        let callbackCalled = false;
-        let handleResult = (err, res) => {
-            if (!callbackCalled) {
-                callbackCalled = true;
-                onResult(err, res);
-            }
-        };
-        let req = info.httpModule.request(info.options, (msg) => {
-            let res = new HttpClientResponse(msg);
-            handleResult(null, res);
-        });
-        req.on('socket', (sock) => {
-            socket = sock;
-        });
-        // If we ever get disconnected, we want the socket to timeout eventually
-        req.setTimeout(this._socketTimeout || 3 * 60000, () => {
-            if (socket) {
-                socket.end();
-            }
-            handleResult(new Error('Request timeout: ' + info.options.path), null);
-        });
-        req.on('error', function (err) {
-            // err has statusCode property
-            // res should have headers
-            handleResult(err, null);
-        });
-        if (data && typeof (data) === 'string') {
-            req.write(data, 'utf8');
-        }
-        if (data && typeof (data) !== 'string') {
-            data.on('close', function () {
-                req.end();
-            });
-            data.pipe(req);
-        }
-        else {
-            req.end();
-        }
-    }
-    /**
-     * Gets an http agent. This function is useful when you need an http agent that handles
-     * routing through a proxy server - depending upon the url and proxy environment variables.
-     * @param serverUrl  The server URL where the request will be sent. For example, https://api.github.com
-     */
-    getAgent(serverUrl) {
-        let parsedUrl = Url.parse(serverUrl);
-        return this._getAgent(parsedUrl);
-    }
-    _prepareRequest(method, requestUrl, headers) {
-        const info = {};
-        info.parsedUrl = requestUrl;
-        const usingSsl = info.parsedUrl.protocol === 'https:';
-        info.httpModule = usingSsl ? https : http;
-        const defaultPort = usingSsl ? 443 : 80;
-        info.options = {};
-        info.options.host = info.parsedUrl.hostname;
-        info.options.port = info.parsedUrl.port ? parseInt(info.parsedUrl.port) : defaultPort;
-        info.options.path = (info.parsedUrl.pathname || '') + (info.parsedUrl.search || '');
-        info.options.method = method;
-        info.options.headers = this._mergeHeaders(headers);
-        if (this.userAgent != null) {
-            info.options.headers["user-agent"] = this.userAgent;
-        }
-        info.options.agent = this._getAgent(info.parsedUrl);
-        // gives handlers an opportunity to participate
-        if (this.handlers) {
-            this.handlers.forEach((handler) => {
-                handler.prepareRequest(info.options);
-            });
-        }
-        return info;
-    }
-    _mergeHeaders(headers) {
-        const lowercaseKeys = obj => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
-        if (this.requestOptions && this.requestOptions.headers) {
-            return Object.assign({}, lowercaseKeys(this.requestOptions.headers), lowercaseKeys(headers));
-        }
-        return lowercaseKeys(headers || {});
-    }
-    _getAgent(parsedUrl) {
-        let agent;
-        let proxyUrl = proxy.getProxyUrl(parsedUrl);
-        let useProxy = proxyUrl && proxyUrl.hostname;
-        if (this._keepAlive && useProxy) {
-            agent = this._proxyAgent;
-        }
-        if (this._keepAlive && !useProxy) {
-            agent = this._agent;
-        }
-        // if agent is already assigned use that agent.
-        if (!!agent) {
-            return agent;
-        }
-        const usingSsl = parsedUrl.protocol === 'https:';
-        let maxSockets = 100;
-        if (!!this.requestOptions) {
-            maxSockets = this.requestOptions.maxSockets || http.globalAgent.maxSockets;
-        }
-        if (useProxy) {
-            // If using proxy, need tunnel
-            if (!tunnel) {
-                tunnel = tunnel$1;
-            }
-            const agentOptions = {
-                maxSockets: maxSockets,
-                keepAlive: this._keepAlive,
-                proxy: {
-                    proxyAuth: proxyUrl.auth,
-                    host: proxyUrl.hostname,
-                    port: proxyUrl.port
-                },
-            };
-            let tunnelAgent;
-            const overHttps = proxyUrl.protocol === 'https:';
-            if (usingSsl) {
-                tunnelAgent = overHttps ? tunnel.httpsOverHttps : tunnel.httpsOverHttp;
-            }
-            else {
-                tunnelAgent = overHttps ? tunnel.httpOverHttps : tunnel.httpOverHttp;
-            }
-            agent = tunnelAgent(agentOptions);
-            this._proxyAgent = agent;
-        }
-        // if reusing agent across request and tunneling agent isn't assigned create a new agent
-        if (this._keepAlive && !agent) {
-            const options = { keepAlive: this._keepAlive, maxSockets: maxSockets };
-            agent = usingSsl ? new https.Agent(options) : new http.Agent(options);
-            this._agent = agent;
-        }
-        // if not using private agent and tunnel agent isn't setup then use global agent
-        if (!agent) {
-            agent = usingSsl ? https.globalAgent : http.globalAgent;
-        }
-        if (usingSsl && this._ignoreSslError) {
-            // we don't want to set NODE_TLS_REJECT_UNAUTHORIZED=0 since that will affect request for entire process
-            // http.RequestOptions doesn't expose a way to modify RequestOptions.agent.options
-            // we have to cast it to any and change it directly
-            agent.options = Object.assign(agent.options || {}, { rejectUnauthorized: false });
-        }
-        return agent;
-    }
-    _performExponentialBackoff(retryNumber) {
-        retryNumber = Math.min(ExponentialBackoffCeiling, retryNumber);
-        const ms = ExponentialBackoffTimeSlice * Math.pow(2, retryNumber);
-        return new Promise(resolve => setTimeout(() => resolve(), ms));
-    }
-}
-exports.HttpClient = HttpClient;
-});
-
-unwrapExports(httpClient);
-var httpClient_1 = httpClient.HttpCodes;
-var httpClient_2 = httpClient.getProxyUrl;
-var httpClient_3 = httpClient.HttpClientResponse;
-var httpClient_4 = httpClient.isHttps;
-var httpClient_5 = httpClient.HttpClient;
-
 var github = createCommonjsModule(function (module, exports) {
 var __importDefault = (commonjsGlobal && commonjsGlobal.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -14375,80 +17145,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 const rest_1 = __importDefault(rest);
 const Context = __importStar(context);
-const httpClient$1 = __importStar(httpClient);
 // We need this in order to extend Octokit
 rest_1.default.prototype = new rest_1.default();
 exports.context = new Context.Context();
 class GitHub extends rest_1.default {
-    constructor(token, opts) {
-        super(GitHub.getOctokitOptions(GitHub.disambiguate(token, opts)));
-        this.graphql = GitHub.getGraphQL(GitHub.disambiguate(token, opts));
-    }
-    /**
-     * Disambiguates the constructor overload parameters
-     */
-    static disambiguate(token, opts) {
-        return [
-            typeof token === 'string' ? token : '',
-            typeof token === 'object' ? token : opts || {}
-        ];
-    }
-    static getOctokitOptions(args) {
-        const token = args[0];
-        const options = Object.assign({}, args[1]); // Shallow clone - don't mutate the object provided by the caller
-        // Auth
-        const auth = GitHub.getAuthString(token, options);
-        if (auth) {
-            options.auth = auth;
-        }
-        // Proxy
-        const agent = GitHub.getProxyAgent(options);
-        if (agent) {
-            // Shallow clone - don't mutate the object provided by the caller
-            options.request = options.request ? Object.assign({}, options.request) : {};
-            // Set the agent
-            options.request.agent = agent;
-        }
-        return options;
-    }
-    static getGraphQL(args) {
-        const defaults = {};
-        const token = args[0];
-        const options = args[1];
-        // Authorization
-        const auth = this.getAuthString(token, options);
-        if (auth) {
-            defaults.headers = {
-                authorization: auth
-            };
-        }
-        // Proxy
-        const agent = GitHub.getProxyAgent(options);
-        if (agent) {
-            defaults.request = { agent };
-        }
-        return distNode$3.graphql.defaults(defaults);
-    }
-    static getAuthString(token, options) {
-        // Validate args
-        if (!token && !options.auth) {
-            throw new Error('Parameter token or opts.auth is required');
-        }
-        else if (token && options.auth) {
-            throw new Error('Parameters token and opts.auth may not both be specified');
-        }
-        return typeof options.auth === 'string' ? options.auth : `token ${token}`;
-    }
-    static getProxyAgent(options) {
-        var _a;
-        if (!((_a = options.request) === null || _a === void 0 ? void 0 : _a.agent)) {
-            const serverUrl = 'https://api.github.com';
-            if (httpClient$1.getProxyUrl(serverUrl)) {
-                const hc = new httpClient$1.HttpClient();
-                return hc.getAgent(serverUrl);
-            }
-        }
-        return undefined;
+    constructor(token, opts = {}) {
+        super(Object.assign(Object.assign({}, opts), { auth: `token ${token}` }));
+        this.graphql = graphql$1.defaults({
+            headers: { authorization: `token ${token}` }
+        });
     }
 }
 exports.GitHub = GitHub;
@@ -14550,7 +17255,7 @@ class Github {
 
 }
 
-var command = createCommonjsModule(function (module, exports) {
+var command$1 = createCommonjsModule(function (module, exports) {
 var __importStar = (commonjsGlobal && commonjsGlobal.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -14630,11 +17335,11 @@ function escapeProperty(s) {
 
 });
 
-unwrapExports(command);
-var command_1 = command.issueCommand;
-var command_2 = command.issue;
+unwrapExports(command$1);
+var command_1 = command$1.issueCommand;
+var command_2 = command$1.issue;
 
-var core$1 = createCommonjsModule(function (module, exports) {
+var core$2 = createCommonjsModule(function (module, exports) {
 var __awaiter = (commonjsGlobal && commonjsGlobal.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14679,7 +17384,7 @@ var ExitCode;
  */
 function exportVariable(name, val) {
     process.env[name] = val;
-    command.issueCommand('set-env', { name }, val);
+    command$1.issueCommand('set-env', { name }, val);
 }
 exports.exportVariable = exportVariable;
 /**
@@ -14687,7 +17392,7 @@ exports.exportVariable = exportVariable;
  * @param secret value of the secret
  */
 function setSecret(secret) {
-    command.issueCommand('add-mask', {}, secret);
+    command$1.issueCommand('add-mask', {}, secret);
 }
 exports.setSecret = setSecret;
 /**
@@ -14695,7 +17400,7 @@ exports.setSecret = setSecret;
  * @param inputPath
  */
 function addPath(inputPath) {
-    command.issueCommand('add-path', {}, inputPath);
+    command$1.issueCommand('add-path', {}, inputPath);
     process.env['PATH'] = `${inputPath}${path$1.delimiter}${process.env['PATH']}`;
 }
 exports.addPath = addPath;
@@ -14721,7 +17426,7 @@ exports.getInput = getInput;
  * @param     value    value to store
  */
 function setOutput(name, value) {
-    command.issueCommand('set-output', { name }, value);
+    command$1.issueCommand('set-output', { name }, value);
 }
 exports.setOutput = setOutput;
 //-----------------------------------------------------------------------
@@ -14745,7 +17450,7 @@ exports.setFailed = setFailed;
  * @param message debug message
  */
 function debug(message) {
-    command.issueCommand('debug', {}, message);
+    command$1.issueCommand('debug', {}, message);
 }
 exports.debug = debug;
 /**
@@ -14753,7 +17458,7 @@ exports.debug = debug;
  * @param message error issue message
  */
 function error(message) {
-    command.issue('error', message);
+    command$1.issue('error', message);
 }
 exports.error = error;
 /**
@@ -14761,7 +17466,7 @@ exports.error = error;
  * @param message warning issue message
  */
 function warning(message) {
-    command.issue('warning', message);
+    command$1.issue('warning', message);
 }
 exports.warning = warning;
 /**
@@ -14780,14 +17485,14 @@ exports.info = info;
  * @param name The name of the output group
  */
 function startGroup(name) {
-    command.issue('group', name);
+    command$1.issue('group', name);
 }
 exports.startGroup = startGroup;
 /**
  * End an output group.
  */
 function endGroup() {
-    command.issue('endgroup');
+    command$1.issue('endgroup');
 }
 exports.endGroup = endGroup;
 /**
@@ -14822,7 +17527,7 @@ exports.group = group;
  * @param     value    value to store
  */
 function saveState(name, value) {
-    command.issueCommand('save-state', { name }, value);
+    command$1.issueCommand('save-state', { name }, value);
 }
 exports.saveState = saveState;
 /**
@@ -14838,28 +17543,28 @@ exports.getState = getState;
 
 });
 
-var core$2 = unwrapExports(core$1);
-var core_1 = core$1.ExitCode;
-var core_2 = core$1.exportVariable;
-var core_3 = core$1.setSecret;
-var core_4 = core$1.addPath;
-var core_5 = core$1.getInput;
-var core_6 = core$1.setOutput;
-var core_7 = core$1.setFailed;
-var core_8 = core$1.debug;
-var core_9 = core$1.error;
-var core_10 = core$1.warning;
-var core_11 = core$1.info;
-var core_12 = core$1.startGroup;
-var core_13 = core$1.endGroup;
-var core_14 = core$1.group;
-var core_15 = core$1.saveState;
-var core_16 = core$1.getState;
+var core$3 = unwrapExports(core$2);
+var core_1 = core$2.ExitCode;
+var core_2 = core$2.exportVariable;
+var core_3 = core$2.setSecret;
+var core_4 = core$2.addPath;
+var core_5 = core$2.getInput;
+var core_6 = core$2.setOutput;
+var core_7 = core$2.setFailed;
+var core_8 = core$2.debug;
+var core_9 = core$2.error;
+var core_10 = core$2.warning;
+var core_11 = core$2.info;
+var core_12 = core$2.startGroup;
+var core_13 = core$2.endGroup;
+var core_14 = core$2.group;
+var core_15 = core$2.saveState;
+var core_16 = core$2.getState;
 
 function getInputs() {
-  const token = core$2.getInput('token');
-  const path = core$2.getInput('path');
-  const title = core$2.getInput('title');
+  const token = core$3.getInput('token');
+  const path = core$3.getInput('path');
+  const title = core$3.getInput('title');
   return validateEnvironmentOptions({
     token,
     path,
@@ -14883,7 +17588,7 @@ function validateEnvironmentOptions(environment) {
   return environment;
 }
 
-async function main() {
+async function main$1() {
   const {
     token,
     title,
@@ -14896,9 +17601,9 @@ async function main() {
   await github.updateCheckWithAnnotations(annotations);
 }
 
-main().catch(error => {
+main$1().catch(error => {
   /* eslint-disable-next-line no-console */
   console.error(error.stack);
-  core$2.setFailed(`annotations-action: ${error.message}`);
+  core$3.setFailed(`annotations-action: ${error.message}`);
 });
 //# sourceMappingURL=index.js.map
