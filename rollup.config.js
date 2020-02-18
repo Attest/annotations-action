@@ -3,7 +3,17 @@ const { dependencies: dependenciesOptions } = require('./package.json')
 
 const dependencies = Object.keys(dependenciesOptions)
 
-module.exports = config().map(configuration => {
+module.exports = config({
+  builds(options) {
+    return [
+      {
+        ...options,
+        output: 'dist/index.js',
+        format: 'cjs',
+      },
+    ]
+  },
+}).map(configuration => {
   const { external = [] } = configuration
 
   return {
