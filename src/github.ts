@@ -1,10 +1,11 @@
 import { Annotations } from '@/annotations'
 import { Context } from '@actions/github/lib/context'
 import { Octokit } from '@octokit/rest'
-import github from '@actions/github'
+
+const github = require('@actions/github')
 
 export class Github {
-  private readonly client: github.GitHub
+  private readonly client: Octokit
   private readonly context: Context
   private readonly owner: string
   private readonly repo: string

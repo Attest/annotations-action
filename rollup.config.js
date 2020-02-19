@@ -1,23 +1,10 @@
 const config = require('@attest/config-rollup-typescript')
-const { dependencies: dependenciesOptions } = require('./package.json')
+const { dependencies: packageDependencies } = require('./package.json')
 
-const dependencies = Object.keys(dependenciesOptions)
+const dependencies = Object.keys(packageDependencies)
 
-module.exports = config({
-  builds(options) {
-    return [
-      {
-        ...options,
-        output: 'dist/index.js',
-        format: 'cjs',
-      },
-    ]
-  },
-}).map(configuration => {
-  const { external = [] } = configuration
+module.exports = config().map(configuration => {
+  const external = configuration.external.filter(dependency => !dependencies.includes(dependency))
 
-  return {
-    ...configuration,
-    external: external.filter(external => !dependencies.includes(external)),
-  }
+  return { ...configuration, external }
 })
