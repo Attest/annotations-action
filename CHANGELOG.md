@@ -1,3 +1,12 @@
+## [1.0.6](https://github.com/Attest/annotations-action/compare/v1.0.5...v1.0.6) (2020-02-19)
+
+### Bug Fix - exclude lib check
+
+use real import and exlude lib checking as there is a problem with the type layer
+
+Reference: [10c1eef](https://github.com/Attest/annotations-action/commit/10c1eef)
+Ticket: [ch8743](https://app.clubhouse.io/attest/story/8743)
+
 ## [1.0.5](https://github.com/Attest/annotations-action/compare/v1.0.4...v1.0.5) (2020-02-19)
 
 ### Bug Fix - fix runtime errors
