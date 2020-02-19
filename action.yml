@@ -12,5 +12,5 @@ inputs:
   title:
     description: 'The actions title'
 runs:
-  using: 'node12'
-  main: 'index.js'
+  using: 'docker'
+  image: 'Dockerfile'

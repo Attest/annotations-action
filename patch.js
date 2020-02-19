@@ -1,3 +1,0 @@
-;(function patchNavigatorIssue() {
-  global.navigator = {}
-})()

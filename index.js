@@ -1,2 +1,0 @@
-require('./patch')
-require('./dist')

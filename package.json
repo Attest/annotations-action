@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "GitHub action for creating annotations from JSON file",
-  "main": "./index.js",
+  "main": "dist/index.js",
   "files": [
     "dist"
   ],
