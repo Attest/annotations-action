@@ -1,8 +1,7 @@
 import { Annotations } from '@/annotations'
 import { Context } from '@actions/github/lib/context'
 import { Octokit } from '@octokit/rest'
-
-const github = require('@actions/github')
+import github from '@actions/github'
 
 export class Github {
   private readonly client: Octokit
@@ -13,9 +12,9 @@ export class Github {
   private check: Octokit.ChecksCreateResponse | null = null
 
   public constructor(token: string) {
-    this.client = new github.GitHub({
+    this.client = (new github.GitHub({
       auth: token,
-    })
+    }) as unknown) as Octokit
     this.context = github.context
     this.owner = this.context.repo.owner
     this.repo = this.context.repo.repo
