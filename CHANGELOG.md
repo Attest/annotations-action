@@ -1,3 +1,12 @@
+## [1.0.5](https://github.com/Attest/annotations-action/compare/v1.0.4...v1.0.5) (2020-02-19)
+
+### Bug Fix - fix runtime errors
+
+patch runtime issue with navigator being included, this is not safe for use in node
+
+Reference: [63e5270](https://github.com/Attest/annotations-action/commit/63e5270)
+Ticket: [ch8743](https://app.clubhouse.io/attest/story/8743)
+
 ## [1.0.4](https://github.com/Attest/annotations-action/compare/v1.0.3...v1.0.4) (2020-02-18)
 
 ### Bug Fix - fix build issues
