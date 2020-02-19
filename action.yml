@@ -8,7 +8,7 @@ inputs:
   secret:
     description: 'The GITHUB_TOKEN secret'
   path:
-    description: 'The JSON file to consume'
+    description: 'The JSON file to cnsume'
   title:
     description: 'The actions title'
 runs:
