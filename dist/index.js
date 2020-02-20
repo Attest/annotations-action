@@ -15024,6 +15024,12 @@ async function main() {
     title,
     path
   } = getInputs();
+
+  if (!fs.existsSync(path)) {
+    core$2.warning(`Input file ${path} does not exist`);
+    return;
+  }
+
   const github = new Github(token);
   await github.createCheck(title);
   const file = fs.readFileSync(path);

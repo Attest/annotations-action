@@ -1,3 +1,29 @@
+## [1.0.7](https://github.com/Attest/annotations-action/compare/v1.0.6...v1.0.7) (2020-02-20)
+
+### Bug Fix - check input path exists
+
+check input path exists; if it does not warn and exitGH-10
+
+Reference: [5ca622d](https://github.com/Attest/annotations-action/commit/5ca622d)
+Ticket: [GH-10]
+
+
+### Build System - ignore lib checking
+
+ignore lib type checking since there is an error in the dependency typesGH-8
+
+Reference: [fd637cd](https://github.com/Attest/annotations-action/commit/fd637cd)
+Ticket: [GH-8]
+
+
+### Documentation - add docs for expected structure
+
+add documenation around the expected structure for the file input
+structure with link to exampleGH-8
+
+Reference: [a7c2f2e](https://github.com/Attest/annotations-action/commit/a7c2f2e)
+Ticket: [GH-8]
+
 ## [1.0.6](https://github.com/Attest/annotations-action/compare/v1.0.5...v1.0.6) (2020-02-19)
 
 ### Bug Fix - exclude lib check
