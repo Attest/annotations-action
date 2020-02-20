@@ -40,3 +40,7 @@ jobs:
           input: './annotations.json'
           title: 'Annotate Files'
 ```
+
+### Input file structure
+
+The expected structure for the input is defined [here in the source](https://github.com/Attest/annotations-action/blob/master/src/annotation.ts), for an example please look at [`annotations.json`](https://github.com/Attest/annotations-action/blob/master/annotations.json).
