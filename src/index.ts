@@ -7,8 +7,12 @@ import fs from 'fs'
 async function main(): Promise<void> {
   const { token, title, path } = getInputs()
 
-  const github = new Github(token)
+  if (!fs.existsSync(path)) {
+    core.warning(`Input file ${path} does not exist`)
+    return
+  }
 
+  const github = new Github(token)
   await github.createCheck(title)
 
   const file = fs.readFileSync(path)
