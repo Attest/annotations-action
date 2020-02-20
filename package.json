@@ -17,7 +17,7 @@
     "---------------CODEOWNERS--------------": ".",
     "codeowners": "yarn generate-codeowners",
     "--------------TYPECHECKING-------------": ".",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --skipLibCheck",
     "----------------BUILD TOOLS----------------": ".",
     "build": "rollup -c",
     "----------------LINTING----------------": ".",
