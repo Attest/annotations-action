@@ -46,41 +46,41 @@
     }
   },
   "dependencies": {
-    "@actions/core": "^1.2.2",
-    "@actions/github": "2.1.0",
-    "@octokit/core": "^2.4.0",
+    "@actions/core": "^1.2.3",
+    "@actions/github": "2.1.1",
+    "@octokit/core": "^2.4.2",
     "@octokit/rest": "^16.43.1"
   },
   "devDependencies": {
-    "@attest/config-babel-preset-env-node": "^0.1.19",
-    "@attest/config-babel-preset-jest": "^0.1.19",
-    "@attest/config-babel-preset-typescript": "^0.2.0",
-    "@attest/config-jest": "^0.3.17",
+    "@attest/babel-preset-env-node": "^1.0.0",
+    "@attest/babel-preset-jest": "^1.0.0",
+    "@attest/babel-preset-typescript": "^1.0.0",
+    "@attest/config-jest": "^0.3.30",
     "@attest/config-npm-package-json-lint": "^0.2.7",
     "@attest/config-prettier": "^0.3.1",
-    "@attest/config-rollup-typescript": "^0.1.41",
-    "@attest/config-typescript": "^1.0.5",
-    "@attest/conventional-changelog": "^0.1.17",
-    "@attest/eslint-config": "^0.2.0",
+    "@attest/config-rollup-typescript": "^0.1.54",
+    "@attest/config-typescript": "^1.0.6",
+    "@attest/conventional-changelog": "^1.0.2",
+    "@attest/eslint-config": "^0.2.5",
     "@attest/eslint-config-node": "^0.1.0",
-    "@attest/eslint-config-typescript": "^0.1.10",
-    "@attest/generate-codeowners": "^0.1.5",
-    "@attest/standard-commits": "^0.1.31",
-    "@babel/core": "^7.8.4",
+    "@attest/eslint-config-typescript": "^0.1.17",
+    "@attest/generate-codeowners": "^0.1.15",
+    "@attest/standard-commits": "^0.1.45",
+    "@babel/core": "^7.8.7",
     "@semantic-release/changelog": "^5.0.0",
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/git": "^9.0.0",
-    "@semantic-release/github": "^7.0.3",
-    "@semantic-release/release-notes-generator": "^9.0.0",
+    "@semantic-release/github": "^7.0.4",
+    "@semantic-release/release-notes-generator": "^9.0.1",
     "husky": "^4.2.3",
-    "lint-staged": "^10.0.7",
+    "lint-staged": "^10.0.8",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "semantic-release": "^17.0.3",
-    "typescript": "^3.7.5"
+    "typescript": "^3.8.3"
   },
   "optionalDependencies": {
-    "eslint-plugin-react-hooks": "^2.3.0"
+    "eslint-plugin-react-hooks": "^2.5.0"
   },
   "engines": {
     "node": ">=12.13 <13"
