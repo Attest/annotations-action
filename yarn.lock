@@ -75,21 +75,21 @@
   dependencies:
     prettier "^1.19.1"
 
-"@attest/config-rollup-typescript@^0.1.54":
-  version "0.1.54"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/0.1.54/9966d1562ea135c0abfb064a6eb042fdff976f8897d8179a9d61dc18d19aa42b#7aefa407401c028f365be7cf0989031aa825f86b"
-  integrity sha512-NxZeGFokrK3bGGAQ7xNGcuhovjPq1PGJ8SSW5ZuRqRGvRD7rwmCyritawxbX8jUR1szKeowi4LXBVHEBAoCB7w==
+"@attest/config-rollup-typescript@^0.1.54", "@attest/config-rollup-typescript@^0.1.55":
+  version "0.1.55"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/0.1.55/23fd47f08b763ebab381382a7f4b66108e6ba14ff6f4c84f95e120ac104dbb62#6f9392715b388d4869d9a6d28d64c114d66b4776"
+  integrity sha512-e+XuxFWYY2IgLWZx+Yb8W9ud/haJXWYmI0Ak2IqsK3pPBUwo3bjsGuzJwtaYUUUfIL6xGYSRXi2T7MMqyW6Ezw==
   dependencies:
-    "@attest/config-rollup" "^1.3.18"
+    "@attest/config-rollup" "^1.3.19"
     "@zerollup/ts-transform-paths" "^1.7.12"
     rollup "^2.0.2"
     rollup-plugin-typescript2 "^0.26.0"
     typescript "3.8.3"
 
-"@attest/config-rollup@^1.3.18":
-  version "1.3.18"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/1.3.18/26315f1246c1d2622bd99600d693fcc1da2f46e910308d61db272907b1bce04e#95505e2633a8ec9ff17a288ff5b44cc6708ccbe7"
-  integrity sha512-NanpDHY147J2RCV+wiSgz36FLYyqMmAud49uSAQyHtKjfkytOc4kgXy+OAg5Bz6waO6dUbiszON2NsaiaGcxXQ==
+"@attest/config-rollup@^1.3.19":
+  version "1.3.19"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/1.3.19/d1b0fc0f05b5c61fac05d9c247bbc38d87d1ec346e9657806c5bca84e1263349#00092392948a4ed08ccd163cddb4727de9a57811"
+  integrity sha512-7d6lFtRIIyGJCjq4g/6nCUvc/pxLg1gcinQ4lmHrJD25g0N3TWSYegKAKjviGj3Hvbqus7bio5e9h1V9Atcq3A==
   dependencies:
     "@babel/core" "^7.8.7"
     "@rollup/plugin-commonjs" "^11.0.2"
@@ -155,11 +155,12 @@
     eslint-plugin-sort-imports-es6-autofix "^0.5.0"
     eslint-plugin-unicorn "^17.0.1"
 
-"@attest/generate-codeowners@^0.1.15":
-  version "0.1.15"
-  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.15/026de6983d56bee0b1d369bb3db08f89a953992e367c6a6ea3500a99c361ab5c#fcbcdf0cade3702eceac2ef9549a513cace8397e"
-  integrity sha512-0CYB/DSJZwDr+U7jr9O3FCnoXM6AcBuOGUD3VNWd+YvcWTY9ZBJyt+cnymLjpb63keQWoMykbX52ISLbXMFRNg==
+"@attest/generate-codeowners@^0.1.17":
+  version "0.1.17"
+  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.17/989ade482bc4066c64fc2a209cc03c7a8a73b132bff5f279515df5e38ecbf221#a2674c4a96695078be1fb9925efd927a5341b56b"
+  integrity sha512-h9dVYLJxQTQsCR2FTstr5q7C1zE0eVpdp5g1AUSsQh3D4M695c2uH3ZV1Cx4G/xkw0yUFJUhy3Ye4m1g0znzQg==
   dependencies:
+    "@attest/config-rollup-typescript" "^0.1.55"
     glob "^7.1.6"
     title-case "^3.0.2"
 
