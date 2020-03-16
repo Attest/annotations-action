@@ -163,10 +163,10 @@
     glob "^7.1.6"
     title-case "^3.0.2"
 
-"@attest/standard-commits@^0.1.45":
-  version "0.1.45"
-  resolved "https://npm.pkg.github.com/download/@attest/standard-commits/0.1.45/dc2243c91fb4ea5d5349506bce3336654c9a5dfcf53e043f43c3678fc116a59f#76d20cd7546e888bb0dac7ea2bac19a0cc3c6d96"
-  integrity sha512-QcQC/fCOP+DfjkvR736NjTYwRJ0UZuxQ6EVEiq9biYrj9fF5M9WaRjBr3FzNXVPEGzfGxk34jnvbhkrSyFG3Jw==
+"@attest/standard-commits@^0.1.46":
+  version "0.1.46"
+  resolved "https://npm.pkg.github.com/download/@attest/standard-commits/0.1.46/deced9998d75c08352140a7965680f1aa730ac552376965b47dfc741ab49bb37#a525171ca2f142549d79640872f1d0291568712e"
+  integrity sha512-d1sKm6s/Mu9JolHkQGcXoyKrne9yj5ycpe2QFA0L2zKu4c9P03SCYST67ayuU/m8CqhyQTxZefUKQwbJroUfmQ==
   dependencies:
     "@commitlint/cli" "^8.3.5"
     "@commitlint/config-conventional" "^8.3.4"
