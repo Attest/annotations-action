@@ -50,15 +50,14 @@
     "@babel/plugin-proposal-private-methods" "^7.8.3"
     "@babel/preset-typescript" "^7.8.3"
 
-"@attest/config-jest@^0.3.30":
-  version "0.3.30"
-  resolved "https://npm.pkg.github.com/download/@attest/config-jest/0.3.30/04ea13def097e21df78e2fe115267296e6cbb0f370497ef78f87bc34f1e370b8#f0ee386a503a42f38645833ddef204defab1d9d7"
-  integrity sha512-qBStUXcOWcHphxcxximNx1DceIhvYwSJjp33+xgRc5Pt+pcvhIbrLDmfL7vgJUkN1sCQbVw7n4H33eNKBt6bNA==
+"@attest/config-jest@^0.3.31":
+  version "0.3.31"
+  resolved "https://npm.pkg.github.com/download/@attest/config-jest/0.3.31/bffe18f3c226ddf54eaca04be4c80e13c14830b1cea8a2da18c4e7303c620606#b84452fb0397efdad7cda7efbcce153f4823c2b8"
+  integrity sha512-c5GrgElGrGNwsftZ3LT6aer/byPoHnkHrk0thVBorndzuZYOllm4dyE3wTQlVDC6Vx6Nqtn9YjXmK7PNVojYFQ==
   dependencies:
     "@babel/core" "^7.8.7"
     babel-jest "^25.1.0"
     jest "^25.1.0"
-  optionalDependencies:
     snapshot-diff "^0.7.0"
 
 "@attest/config-npm-package-json-lint@^0.2.7":
