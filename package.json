@@ -80,7 +80,7 @@
     "typescript": "^3.8.3"
   },
   "optionalDependencies": {
-    "eslint-plugin-react-hooks": "^2.5.0"
+    "eslint-plugin-react-hooks": "^2.5.1"
   },
   "engines": {
     "node": ">=12.13 <13"
