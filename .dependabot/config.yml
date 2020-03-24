@@ -4,6 +4,10 @@ update_configs:
     directory: '/'
     update_schedule: 'weekly'
     version_requirement_updates: increase_versions
+    automerged_updates:
+      - match:
+          dependency_type: 'all'
+          update_type: 'semver:patch'
     default_labels:
       - '🤖 Dependency update'
     commit_message:
