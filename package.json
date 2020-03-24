@@ -61,7 +61,7 @@
     "@attest/config-rollup-typescript": "^0.1.56",
     "@attest/config-typescript": "^1.0.6",
     "@attest/conventional-changelog": "^1.0.4",
-    "@attest/eslint-config": "^0.2.5",
+    "@attest/eslint-config": "^0.2.7",
     "@attest/eslint-config-node": "^0.1.0",
     "@attest/eslint-config-typescript": "^0.1.18",
     "@attest/generate-codeowners": "^0.1.17",
