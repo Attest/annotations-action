@@ -50,12 +50,12 @@
     "@babel/plugin-proposal-private-methods" "^7.8.3"
     "@babel/preset-typescript" "^7.8.3"
 
-"@attest/config-jest@^0.3.32":
-  version "0.3.32"
-  resolved "https://npm.pkg.github.com/download/@attest/config-jest/0.3.32/5cb13fe746b8bd9432dd46a50ab29e6fe95e359aed247c258b9ccf8033e9efb8#8eaf1c234b5e9546b254ba1cc83d163857f45e58"
-  integrity sha512-PHvjsNkqXBPmsxToafGKSqpu6k7jMk40GabwUcu5ff1Gd8W5ayJx0gqz9F4L1KFCZGM5JsHwjsihdsGrd0Vi2g==
+"@attest/config-jest@^0.3.36":
+  version "0.3.36"
+  resolved "https://npm.pkg.github.com/download/@attest/config-jest/0.3.36/0ec521a52532f555b47f31fd85d8e6b93b9657e0f0ac44ca531e0a7649a2259d#f71dd557ec78e80cda1e8968b3b1194541adb886"
+  integrity sha512-soOhYp9moMciwI9hVHdEqtolZGo1NYjBPpNWvo9e6zE2FdQQjknI+/c+5Ddz0yWLL/BfsXe1zPOuVVdPAC8t0w==
   dependencies:
-    "@babel/core" "^7.8.7"
+    "@babel/core" "^7.9.0"
     babel-jest "^25.1.0"
     jest "^25.1.0"
     snapshot-diff "^0.7.0"
