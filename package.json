@@ -54,7 +54,7 @@
   "devDependencies": {
     "@attest/babel-preset-env-node": "^1.0.0",
     "@attest/babel-preset-jest": "^1.0.0",
-    "@attest/babel-preset-typescript": "^2.0.0",
+    "@attest/babel-preset-typescript": "^2.0.1",
     "@attest/config-jest": "^0.3.32",
     "@attest/config-npm-package-json-lint": "^0.2.7",
     "@attest/config-prettier": "^0.3.1",

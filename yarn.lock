@@ -41,14 +41,14 @@
     "@babel/plugin-transform-modules-commonjs" "^7.8.3"
     "@babel/plugin-transform-runtime" "^7.8.3"
 
-"@attest/babel-preset-typescript@^2.0.0":
-  version "2.0.0"
-  resolved "https://npm.pkg.github.com/download/@attest/babel-preset-typescript/2.0.0/f1e692c36c4aadea012553f94e85f25da8e30b66f9a5892fa01504421044d599#c5ff1f63a9e9d62a5818202f839a1cd76056254a"
-  integrity sha512-P+bqaKIE9dL6TWWERUfoxqu++LnLT1cEy/KD0X+MMF+s8NfBLGrn33YVw4ZdvJgqrKLI8CbqcPWqZd/U699wsw==
+"@attest/babel-preset-typescript@^2.0.1":
+  version "2.0.1"
+  resolved "https://npm.pkg.github.com/download/@attest/babel-preset-typescript/2.0.1/374634424d734d54879dc7d262099fdcf67133b2858a8f7da36bcbc152f8a8d9#f8ba61c7b28a31f2e7b5ba6df79413422770012f"
+  integrity sha512-rv1qgcaaFBRlWW3UXzL9VT6xCup/SsB+e/CrD7E7x5A07D3p1yZYpJd057VNY7Gf6rKPR78OoqfNeanEWnJIgA==
   dependencies:
     "@babel/plugin-proposal-class-properties" "^7.8.3"
     "@babel/plugin-proposal-private-methods" "^7.8.3"
-    "@babel/preset-typescript" "^7.8.3"
+    "@babel/preset-typescript" "^7.9.0"
 
 "@attest/config-jest@^0.3.32":
   version "0.3.32"
@@ -837,10 +837,10 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.8.3"
 
-"@babel/plugin-transform-typescript@^7.8.3":
-  version "7.8.7"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.8.7.tgz#48bccff331108a7b3a28c3a4adc89e036dc3efda"
-  integrity sha512-7O0UsPQVNKqpHeHLpfvOG4uXmlw+MOxYvUv6Otc9uH5SYMIxvF6eBdjkWvC3f9G+VXe0RsNExyAQBeTRug/wqQ==
+"@babel/plugin-transform-typescript@^7.9.0":
+  version "7.9.4"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.9.4.tgz#4bb4dde4f10bbf2d787fce9707fb09b483e33359"
+  integrity sha512-yeWeUkKx2auDbSxRe8MusAG+n4m9BFY/v+lPjmQDgOFX5qnySkUY5oXzkp6FwPdsYqnKay6lorXYdC0n3bZO7w==
   dependencies:
     "@babel/helper-create-class-features-plugin" "^7.8.3"
     "@babel/helper-plugin-utils" "^7.8.3"
@@ -917,13 +917,13 @@
     levenary "^1.1.1"
     semver "^5.5.0"
 
-"@babel/preset-typescript@^7.8.3":
-  version "7.8.3"
-  resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.8.3.tgz#90af8690121beecd9a75d0cc26c6be39d1595d13"
-  integrity sha512-qee5LgPGui9zQ0jR1TeU5/fP9L+ovoArklEqY12ek8P/wV5ZeM/VYSQYwICeoT6FfpJTekG9Ilay5PhwsOpMHA==
+"@babel/preset-typescript@^7.9.0":
+  version "7.9.0"
+  resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.9.0.tgz#87705a72b1f0d59df21c179f7c3d2ef4b16ce192"
+  integrity sha512-S4cueFnGrIbvYJgwsVFKdvOmpiL0XGw9MFW9D0vgRys5g36PBhZRL8NX8Gr2akz8XRtzq6HuDXPD/1nniagNUg==
   dependencies:
     "@babel/helper-plugin-utils" "^7.8.3"
-    "@babel/plugin-transform-typescript" "^7.8.3"
+    "@babel/plugin-transform-typescript" "^7.9.0"
 
 "@babel/runtime-corejs3@^7.8.3":
   version "7.8.7"
