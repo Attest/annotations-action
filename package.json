@@ -58,7 +58,7 @@
     "@attest/config-jest": "^0.3.32",
     "@attest/config-npm-package-json-lint": "^0.2.7",
     "@attest/config-prettier": "^0.3.1",
-    "@attest/config-rollup-typescript": "^0.1.56",
+    "@attest/config-rollup-typescript": "^1.0.1",
     "@attest/config-typescript": "^1.0.6",
     "@attest/conventional-changelog": "^1.0.4",
     "@attest/eslint-config": "^0.2.5",
