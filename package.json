@@ -67,7 +67,7 @@
     "@attest/generate-codeowners": "^0.1.17",
     "@attest/standard-commits": "^0.1.50",
     "@babel/core": "^7.9.0",
-    "@semantic-release/changelog": "^5.0.0",
+    "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/git": "^9.0.0",
     "@semantic-release/github": "^7.0.5",
