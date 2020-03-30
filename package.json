@@ -48,32 +48,32 @@
   "dependencies": {
     "@actions/core": "^1.2.3",
     "@actions/github": "2.1.1",
-    "@octokit/core": "^2.4.2",
+    "@octokit/core": "^2.4.3",
     "@octokit/rest": "^16.43.1"
   },
   "devDependencies": {
-    "@attest/babel-preset-env-node": "^1.0.0",
-    "@attest/babel-preset-jest": "^1.0.0",
-    "@attest/babel-preset-typescript": "^2.0.0",
-    "@attest/config-jest": "^0.3.32",
+    "@attest/babel-preset-env-node": "^1.0.2",
+    "@attest/babel-preset-jest": "^1.0.2",
+    "@attest/babel-preset-typescript": "^2.0.1",
+    "@attest/config-jest": "^0.3.36",
     "@attest/config-npm-package-json-lint": "^0.2.7",
-    "@attest/config-prettier": "^0.3.1",
-    "@attest/config-rollup-typescript": "^0.1.56",
+    "@attest/config-prettier": "^0.3.2",
+    "@attest/config-rollup-typescript": "^1.0.0",
     "@attest/config-typescript": "^1.0.6",
-    "@attest/conventional-changelog": "^1.0.4",
-    "@attest/eslint-config": "^0.2.5",
+    "@attest/conventional-changelog": "^1.0.8",
+    "@attest/eslint-config": "^0.2.8",
     "@attest/eslint-config-node": "^0.1.0",
-    "@attest/eslint-config-typescript": "^0.1.18",
-    "@attest/generate-codeowners": "^0.1.17",
-    "@attest/standard-commits": "^0.1.50",
+    "@attest/eslint-config-typescript": "^0.1.21",
+    "@attest/generate-codeowners": "^0.1.22",
+    "@attest/standard-commits": "^0.1.51",
     "@babel/core": "^7.9.0",
-    "@semantic-release/changelog": "^5.0.0",
+    "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/commit-analyzer": "^8.0.1",
     "@semantic-release/git": "^9.0.0",
     "@semantic-release/github": "^7.0.5",
     "@semantic-release/release-notes-generator": "^9.0.1",
     "husky": "^4.2.3",
-    "lint-staged": "^10.0.8",
+    "lint-staged": "^10.0.10",
     "npm-run-all": "^4.1.5",
     "rimraf": "^3.0.2",
     "semantic-release": "^17.0.3",
@@ -84,6 +84,10 @@
   },
   "engines": {
     "node": ">=12.13 <13"
+  },
+  "resolutions": {
+    "minimist": "^1.2.5",
+    "**/os-locale": "^3.1.0"
   },
   "contributors": [
     "Blake Newman <blake.newman@askattest.com> (https://askattest.com)"
