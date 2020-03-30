@@ -74,7 +74,7 @@
   dependencies:
     prettier "^1.19.1"
 
-"@attest/config-rollup-typescript@^0.1.55", "@attest/config-rollup-typescript@^0.1.56":
+"@attest/config-rollup-typescript@^0.1.56":
   version "0.1.56"
   resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/0.1.56/35c6ced5f3b72cb6a728a2eae637acf2fe9536dc765469bdddae6debf57329de#c7ac753ad308e65102d808caa4c4007747990f6b"
   integrity sha512-yJYyMAea9FYuw2aVCeidVfdn7eCXnp16WiQD1I14Q04QWxN3Kq9RKcLo+r0wWpxvRyL/cT7aAyd92bI9MNyAxQ==
@@ -82,6 +82,17 @@
     "@attest/config-rollup" "^1.3.20"
     "@zerollup/ts-transform-paths" "^1.7.12"
     rollup "^2.0.6"
+    rollup-plugin-typescript2 "^0.26.0"
+    typescript "3.8.3"
+
+"@attest/config-rollup-typescript@^1.0.0":
+  version "1.0.0"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.0/cac64472b8aee1613287eca3c8dda52b75f40d9a26d19ba84546ff33a57a6b5b#9957b403c9a41ac5b2c349bcf30344f6c47bf323"
+  integrity sha512-uI3orC6IcBqq7h7zy+EX5VKDvI49v5p9APz1W3WnVqendwg5f+q1f3sGh8CcHnKkz6SqAOxPtHeL9+PrYUEKMg==
+  dependencies:
+    "@attest/config-rollup" "^2.0.0"
+    "@zerollup/ts-transform-paths" "^1.7.12"
+    rollup "^2.1.0"
     rollup-plugin-typescript2 "^0.26.0"
     typescript "3.8.3"
 
@@ -95,6 +106,19 @@
     "@rollup/plugin-json" "^4.0.2"
     "@rollup/plugin-node-resolve" "^7.1.1"
     rollup "^2.0.6"
+    rollup-plugin-babel "^4.4.0"
+    rollup-plugin-multi-input "^1.1.1"
+
+"@attest/config-rollup@^2.0.0":
+  version "2.0.0"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/2.0.0/e9394e18765cefe4570a0893a66aaddb57eb91adbfb47f171fade0e497a8b75c#3040a140004717443f3e4f71a1959886727c2af6"
+  integrity sha512-X7djnUY5q6SwuN4QW728B190imxAwG5CrtfWOq8Z5BBVa8HNnfL0Ov0hgsfDu3TleLGl+sPOOoNNhJyNjP9qYA==
+  dependencies:
+    "@babel/core" "^7.9.0"
+    "@rollup/plugin-commonjs" "^11.0.2"
+    "@rollup/plugin-json" "^4.0.2"
+    "@rollup/plugin-node-resolve" "^7.1.1"
+    rollup "^2.1.0"
     rollup-plugin-babel "^4.4.0"
     rollup-plugin-multi-input "^1.1.1"
 
@@ -153,12 +177,12 @@
     eslint-plugin-sort-imports-es6-autofix "^0.5.0"
     eslint-plugin-unicorn "^17.0.1"
 
-"@attest/generate-codeowners@^0.1.17":
-  version "0.1.17"
-  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.17/989ade482bc4066c64fc2a209cc03c7a8a73b132bff5f279515df5e38ecbf221#a2674c4a96695078be1fb9925efd927a5341b56b"
-  integrity sha512-h9dVYLJxQTQsCR2FTstr5q7C1zE0eVpdp5g1AUSsQh3D4M695c2uH3ZV1Cx4G/xkw0yUFJUhy3Ye4m1g0znzQg==
+"@attest/generate-codeowners@^0.1.22":
+  version "0.1.22"
+  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.22/bd2298ddd1d47d5c61a1b70e4f93cb17f2deba3b6a08577f6b06328fbe0da5ed#6dc94e63a2511e46e5c84d6f86e7bea2237d2485"
+  integrity sha512-kId6SJJ1yiw5bqvd9CVSHrei2ohAFqCZxIBHxCwDeduR2/Oycac1JQciMA7qU75WY+RRiFFAbwMlljLc01LLfA==
   dependencies:
-    "@attest/config-rollup-typescript" "^0.1.55"
+    "@attest/config-rollup-typescript" "^1.0.0"
     glob "^7.1.6"
     title-case "^3.0.2"
 
@@ -8727,6 +8751,13 @@ rollup@^2.0.6:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.1.0.tgz#552e248e397a06b9c6db878c0564ca4ee06729c9"
   integrity sha512-gfE1455AEazVVTJoeQtcOq/U6GSxwoj4XPSWVsuWmgIxj7sBQNLDOSA82PbdMe+cP8ql8fR1jogPFe8Wg8g4SQ==
+  optionalDependencies:
+    fsevents "~2.1.2"
+
+rollup@^2.1.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.3.0.tgz#0b9e1c19bea22464958854dae646b8b40d2d3ed5"
+  integrity sha512-nIq2Z9YwNbEfqTlAXe/tVl8CwUsjX/8Q5Jxlx+JRoYCu5keKLc6k0zyt11sM6WtCDxhmmJEIosFy9y26ZFRx6w==
   optionalDependencies:
     fsevents "~2.1.2"
 
