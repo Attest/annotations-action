@@ -67,12 +67,12 @@
   dependencies:
     npm-package-json-lint "^4.6.0"
 
-"@attest/config-prettier@^0.3.1":
-  version "0.3.1"
-  resolved "https://npm.pkg.github.com/download/@attest/config-prettier/0.3.1/9758fbd61ea6e11dae4545faa541e87afd29528b249d84525f0c5d9fad07c4c9#5c9fb934a6ed3abdcc3d7082026bd2309b483671"
-  integrity sha512-iQ2kiovwoMqyaUci7gdRtqkoz1pFWmA+KO1NlHEeA3jUIPdJ0ajSY6tVUFDGg7biG1U0Igx319K6NNvtVhEJ8g==
+"@attest/config-prettier@^0.3.2":
+  version "0.3.2"
+  resolved "https://npm.pkg.github.com/download/@attest/config-prettier/0.3.2/b07b019620a94529d5894551c10938a2353385b6425118e852bee3d57aa80f13#cc08cd8357b2693afa5a1d98b22b0bd7132fabc3"
+  integrity sha512-2utzHu+w2rtVTIRmmqnKhFtZiwLrDuaL9UNR+yvAZIM1O7nt40nH/yayRYuB/lhsDsG9mdhKEz5htoj/osSp7g==
   dependencies:
-    prettier "^1.19.1"
+    prettier "^2.0.1"
 
 "@attest/config-rollup-typescript@^0.1.55", "@attest/config-rollup-typescript@^0.1.56":
   version "0.1.56"
@@ -7960,10 +7960,10 @@ prepend-http@^1.0.1:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-1.0.4.tgz#d4f4562b0ce3696e41ac52d0e002e57a635dc6dc"
   integrity sha1-1PRWKwzjaW5BrFLQ4ALlemNdxtw=
 
-prettier@^1.19.1:
-  version "1.19.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
-  integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
+prettier@^2.0.1:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.2.tgz#1ba8f3eb92231e769b7fcd7cb73ae1b6b74ade08"
+  integrity sha512-5xJQIPT8BraI7ZnaDwSbu5zLrB6vvi8hVV58yHQ+QK64qrY40dULy0HSRlQ2/2IdzeBpjhDkqdcFBnFeDEMVdg==
 
 pretty-format@^25.1.0:
   version "25.1.0"
