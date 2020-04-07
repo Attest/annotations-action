@@ -1474,7 +1474,7 @@
     once "^1.4.0"
     universal-user-agent "^4.0.0"
 
-"@octokit/rest@^17.0.0":
+"@octokit/rest@^17.0.0", "@octokit/rest@^17.1.4":
   version "17.1.4"
   resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-17.1.4.tgz#b03eb97635de62b48428f998ad1cb9244edd2d10"
   integrity sha512-LGghhepxoXyvi7ew0OdedrlwXQog8gvTbcdXoQ6RDKnzoYW2rBpcqeWC4fTuPUp9K0UEykcMix8kFnQ5b+64JQ==
