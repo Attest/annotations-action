@@ -75,21 +75,21 @@
   dependencies:
     prettier "^2.0.3"
 
-"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.3":
-  version "1.0.3"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.3/b8099bda99c57013b8dff184e1852b3cd43463e0dfe761e7dea9369cfafd319a#4cd01f2b5e334b08f567b6feee56de9603adf345"
-  integrity sha512-bfqsubCNQX9NLqx8RYxfbSYYkiyaJo3tRwNRV3nj2K5/wrFtlfFOYA9w81Xob4i5hmWboGIfDaGH688iW+r6ow==
+"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.4":
+  version "1.0.4"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.4/610bad6da4bddf974c320fe36332e9a7491cad923ff6a08f495c19f239bf472c#d2e46681a88dd4f34255eef512d970efd148d859"
+  integrity sha512-bkFttyC4zbonN4Fn5B3CMsUGOUjbkaqMQe6N527EZybQjcU9Hmao8vpSj3D1TET4lsLoNwupp6J5pLyeBe8NRg==
   dependencies:
-    "@attest/config-rollup" "^2.0.3"
+    "@attest/config-rollup" "^2.0.4"
     "@zerollup/ts-transform-paths" "^1.7.17"
     rollup "^2.3.3"
     rollup-plugin-typescript2 "^0.27.0"
     typescript "3.8.3"
 
-"@attest/config-rollup@^2.0.3":
-  version "2.0.3"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/2.0.3/dbdf907b8da47c38488094a383db229379e031a435e8b366d4f6ac6c585631cd#5b91f12f126b591e422a30f48e1662e9c38aa678"
-  integrity sha512-82YETOUOIAeL3Wlv+0Oa3lkr1frQv5bLWpP+H7MvbCdjgHoSD4ZDq6ffbrquv6nLRvYiAPNode42xcd1xfZVlA==
+"@attest/config-rollup@^2.0.4":
+  version "2.0.4"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/2.0.4/3eabbadf4d8c706252837dcfccb67e8fda6a5606f36ae1ffec7520e211ce842c#8c60f1c281ecfe237dafb53f633e16655a533a8a"
+  integrity sha512-kWTob93NANt0L2b/SiVfSrIhMzsVI+QW1t106IF/i8+k8/hQGL1pdWXzzMbf23bM0TNcq52AO03bLweH1TC2vw==
   dependencies:
     "@babel/core" "^7.9.0"
     "@rollup/plugin-commonjs" "^11.0.2"
