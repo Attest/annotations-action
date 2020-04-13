@@ -164,14 +164,14 @@
     glob "^7.1.6"
     title-case "^3.0.2"
 
-"@attest/standard-commits@^0.1.51":
-  version "0.1.52"
-  resolved "https://npm.pkg.github.com/download/@attest/standard-commits/0.1.52/a7e0d6337d4c5a6148fb8f06cc4d31b663173db7690a9214ee2274f0d94e4f8a#5b0a23f280386b5b345d6b863fcfb35b46cf6a61"
-  integrity sha512-27CGOl/WOYJpUt1U2dw0ApHUrPCy2peM9nCvmswhTtAQbnjTQ+fdFKRQ6qVQuBvM0jNkmZd7q07rvIkPrVIhYQ==
+"@attest/standard-commits@^0.1.55":
+  version "0.1.55"
+  resolved "https://npm.pkg.github.com/download/@attest/standard-commits/0.1.55/e18d131b45568272c2ebfa87ce9dcf527a4d974ef92c005be6770ec8628eb787#4d45875e96f741c89ec2ce79a3a0cf78c17b155e"
+  integrity sha512-ZX+cfNrFRs/hukmpdkZxkyihpM90/+q3yqvy0DW+b3ghgLaDSnTmC0ZShn6lz53LCHpvEWgOPjckojMys/JXig==
   dependencies:
     "@commitlint/cli" "^8.3.5"
     "@commitlint/config-conventional" "^8.3.4"
-    chalk "^3.0.0"
+    chalk "^4.0.0"
     commitizen "^4.0.3"
     conventional-commit-types "^3.0.0"
     core-js "^3.6.3"
@@ -2601,6 +2601,14 @@ chalk@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-3.0.0.tgz#3f73c2bf526591f574cc492c51e2456349f844e4"
   integrity sha512-4D3B6Wf41KOYRFdszmDqMCGq5VV/uMAB273JILmO+3jAlh8X4qDtdtgCR3fxtbLEMzSx22QdhnDcJvu2u1fVwg==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
+chalk@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.0.0.tgz#6e98081ed2d17faab615eb52ac66ec1fe6209e72"
+  integrity sha512-N9oWFcegS0sFr9oh1oz2d7Npos6vNoWW9HvtCg5N1KRFpUhaAhvTv5Y58g880fZaEYSNm3qDz8SU1UrGvp+n7A==
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
