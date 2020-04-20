@@ -23,7 +23,7 @@
   dependencies:
     tunnel "0.0.6"
 
-"@attest/babel-preset-env-node@^1.0.2", "@attest/babel-preset-env-node@^1.0.3":
+"@attest/babel-preset-env-node@^1.0.3":
   version "1.0.3"
   resolved "https://npm.pkg.github.com/download/@attest/babel-preset-env-node/1.0.3/52d858232fe0783a82f24cd45c9b009b927df5e8fc25bde13a56c93d11096ff1#e3bd88af82404f5726d5b556296c2d4e0a9f2597"
   integrity sha512-K/ImFIE0m6foCJ2yeD0u//NTkKi0FFobND0SJNw7+HAodsLSJ550bs7eXkocOFg11nS7mWqq9TjmM23XcYvb3Q==
@@ -31,12 +31,12 @@
     "@babel/core" "^7.9.0"
     "@babel/preset-env" "^7.9.5"
 
-"@attest/babel-preset-jest@^1.0.2":
-  version "1.0.2"
-  resolved "https://npm.pkg.github.com/download/@attest/babel-preset-jest/1.0.2/7b9bc239625ab28181266c05dc9a999cc2d471bdb4c54719b1ad0114d9401912#1edff067fb56ed9e81ccd4b532d98073658ce371"
-  integrity sha512-skw1JDr25syxJ3VXTDkp9AJ+anNkZpUjUe4PKMwHdtb8gVNqSrp8F/tBd9Kt5QkxydUYvsg7mGPdU/J9eROVhg==
+"@attest/babel-preset-jest@^1.0.3":
+  version "1.0.3"
+  resolved "https://npm.pkg.github.com/download/@attest/babel-preset-jest/1.0.3/b29a4173c7be8d2cd896921c8d85b1899feb96ab77f9c95526d578a9c8eecd0a#6c56be2748ee2f45b4cd5787556b59f3f66d95a1"
+  integrity sha512-L/L45Y3o8iPoJmyyYZW1bKwelSXSLtxEHK0AtGgfy/+IXobkcNSYqcSwtYTD8AEw3vRnNgCsCx79lOEKwMJM5A==
   dependencies:
-    "@attest/babel-preset-env-node" "^1.0.2"
+    "@attest/babel-preset-env-node" "^1.0.3"
     "@babel/core" "^7.9.0"
     "@babel/plugin-transform-modules-commonjs" "^7.8.3"
     "@babel/plugin-transform-runtime" "^7.8.3"
