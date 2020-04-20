@@ -75,7 +75,7 @@
   dependencies:
     prettier "^2.0.3"
 
-"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.8":
+"@attest/config-rollup-typescript@^1.0.8":
   version "1.0.8"
   resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.8/c1f37a8ca4f86bcbc5f111ffd2d7afe6aa5cfa3b6b54f36fd1ae3bb03b3cdfdf#cf14328695af8954c7f96f2e45af7d537598831c"
   integrity sha512-UACDmujpuMEepHE7o6jddCMjaU3xOvFiw6QH+A0HyagHGJsxQ0qb7y8UeO6u2+GX8ylQV2X25KzSE21fR9pr+Q==
@@ -155,12 +155,12 @@
     eslint-plugin-sort-imports-es6-autofix "^0.5.0"
     eslint-plugin-unicorn "^18.0.1"
 
-"@attest/generate-codeowners@^0.1.22":
-  version "0.1.23"
-  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.23/61388184895f08779f5212715019e6e67251e1426eb44d30af30985bc3f4c7e9#6c9e8410505cd7c5e9369409a1bf1bda2a7f0112"
-  integrity sha512-ke6Qurws3XEMVny0hOtorc46iKBx+7N0woHtrOpycUZGplrB7XA2E9Pg2zRQN/VxP98y8DtMjSutJc3iwx8nVw==
+"@attest/generate-codeowners@^0.1.30":
+  version "0.1.30"
+  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.30/6b1bf03e82fda963e3da606272b2ec7187ab30f7a59605c320523836ee2011b6#56efc97ceee86803e98b0c3313c7bc609b89f6d0"
+  integrity sha512-caOectylb7tFqrw1gliZviB6oCtL7yal6fVBN+dv31aAQZ3k/VL5+8wLb/6byuGqmZ/GT530W2MgCBCILF81Pg==
   dependencies:
-    "@attest/config-rollup-typescript" "^1.0.1"
+    "@attest/config-rollup-typescript" "^1.0.8"
     glob "^7.1.6"
     title-case "^3.0.2"
 
