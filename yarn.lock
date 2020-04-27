@@ -123,26 +123,41 @@
   optionalDependencies:
     eslint "^6.8.0"
 
-"@attest/eslint-config-typescript@^0.1.21":
-  version "0.1.22"
-  resolved "https://npm.pkg.github.com/download/@attest/eslint-config-typescript/0.1.22/ef3481ba069cb4149975a5a798e17e8041e9ab7830a9f8c83fb66ed4c3ba1974#fdce045bc5b7722e0ed3361c5030f64806a39cdc"
-  integrity sha512-cBLsEA7VktSUp9HFqOLuAJ3Yw1guKtllG4NqwoHvvpLG8Vxyg9WSshcgwJXhIo6ZKJMjbL6EIuBqe2Wj4x22Kw==
+"@attest/eslint-config-typescript@^1.0.4":
+  version "1.0.4"
+  resolved "https://npm.pkg.github.com/download/@attest/eslint-config-typescript/1.0.4/0ce06666a3ebe3e4d960ede10a0ee1d45ebc0ad44506e5d508c89ede4f0feabd#a301aa2db8f7f5cf901a0080b8407e70b60150b6"
+  integrity sha512-um9B5LRXc4XrDlOq1NcPmwDbON4LFa3ZH5y3AmYgqGjr1XaUjphEpW83+6YosNA1ANTH+mmnSyvAVbeow97E0A==
   dependencies:
-    "@attest/eslint-config" "^0.2.9"
-    "@typescript-eslint/eslint-plugin" "^2.24.0"
-    "@typescript-eslint/parser" "^2.22.0"
-    eslint-config-airbnb-typescript "^7.2.0"
-  optionalDependencies:
+    "@attest/eslint-config" "^1.0.0"
+    "@typescript-eslint/eslint-plugin" "^2.28.0"
+    "@typescript-eslint/parser" "^2.28.0"
     eslint "^6.8.0"
+    eslint-config-airbnb-typescript "^7.2.1"
     eslint-plugin-import "^2.20.1"
     eslint-plugin-jsx-a11y "^6.2.3"
     eslint-plugin-react "^7.19.0"
-    eslint-plugin-react-hooks "^2.5.1"
+    eslint-plugin-react-hooks "^3.0.0"
 
-"@attest/eslint-config@^0.2.8", "@attest/eslint-config@^0.2.9":
+"@attest/eslint-config@^0.2.8":
   version "0.2.9"
   resolved "https://npm.pkg.github.com/download/@attest/eslint-config/0.2.9/2e94c5edcc0afe2dc6eafde71a768b448883e04e4ba895f79bd627a1a62c7da9#19c12e4a9434af9dc65d88855a9799789612cb21"
   integrity sha512-1TSktFKZXsxNxgbzHD5Jeq965N/H0t6y7gsC2NlhSXjrX0ypqBmLd8swlD4F9tjt0ZMlwm7bYsDSZvlX8nI5jQ==
+  dependencies:
+    eslint "^6.7.2"
+    eslint-config-airbnb-base "^14.1.0"
+    eslint-config-prettier "^6.10.1"
+    eslint-plugin-import "^2.20.2"
+    eslint-plugin-json "^2.1.1"
+    eslint-plugin-markdown "^1.0.2"
+    eslint-plugin-package-json "^0.1.4"
+    eslint-plugin-promise "^4.2.1"
+    eslint-plugin-sort-imports-es6-autofix "^0.5.0"
+    eslint-plugin-unicorn "^18.0.1"
+
+"@attest/eslint-config@^1.0.0":
+  version "1.0.0"
+  resolved "https://npm.pkg.github.com/download/@attest/eslint-config/1.0.0/f05b820f7e02b7be49800b400077d636cabd5f280f73f017d8d56055b89f46df#60d8652f48cbd96c5f773d48fc5001715cbad7d4"
+  integrity sha512-W0wP6A4plhEuk+CjV5p49H10NnKLYxgmUO/5D1/Nsn+gF0R/+A4evWG2o6OTKJ3YAL+ZkInPfGHj7uxpVFRafQ==
   dependencies:
     eslint "^6.7.2"
     eslint-config-airbnb-base "^14.1.0"
@@ -1817,40 +1832,40 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^2.24.0":
-  version "2.25.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-2.25.0.tgz#0b60917332f20dcff54d0eb9be2a9e9f4c9fbd02"
-  integrity sha512-W2YyMtjmlrOjtXc+FtTelVs9OhuR6OlYc4XKIslJ8PUJOqgYYAPRJhAqkYRQo3G4sjvG8jSodsNycEn4W2gHUw==
+"@typescript-eslint/eslint-plugin@^2.28.0":
+  version "2.29.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-2.29.0.tgz#c9efab7624e3dd6d144a0e4577a541d1bd42c2ac"
+  integrity sha512-X/YAY7azKirENm4QRpT7OVmzok02cSkqeIcLmdz6gXUQG4Hk0Fi9oBAynSAyNXeGdMRuZvjBa0c1Lu0dn/u6VA==
   dependencies:
-    "@typescript-eslint/experimental-utils" "2.25.0"
+    "@typescript-eslint/experimental-utils" "2.29.0"
     functional-red-black-tree "^1.0.1"
     regexpp "^3.0.0"
     tsutils "^3.17.1"
 
-"@typescript-eslint/experimental-utils@2.25.0":
-  version "2.25.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/experimental-utils/-/experimental-utils-2.25.0.tgz#13691c4fe368bd377b1e5b1e4ad660b220bf7714"
-  integrity sha512-0IZ4ZR5QkFYbaJk+8eJ2kYeA+1tzOE1sBjbwwtSV85oNWYUBep+EyhlZ7DLUCyhMUGuJpcCCFL0fDtYAP1zMZw==
+"@typescript-eslint/experimental-utils@2.29.0":
+  version "2.29.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/experimental-utils/-/experimental-utils-2.29.0.tgz#3cb8060de9265ba131625a96bbfec31ba6d4a0fe"
+  integrity sha512-H/6VJr6eWYstyqjWXBP2Nn1hQJyvJoFdDtsHxGiD+lEP7piGnGpb/ZQd+z1ZSB1F7dN+WsxUDh8+S4LwI+f3jw==
   dependencies:
     "@types/json-schema" "^7.0.3"
-    "@typescript-eslint/typescript-estree" "2.25.0"
+    "@typescript-eslint/typescript-estree" "2.29.0"
     eslint-scope "^5.0.0"
     eslint-utils "^2.0.0"
 
-"@typescript-eslint/parser@^2.22.0", "@typescript-eslint/parser@^2.24.0":
-  version "2.25.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-2.25.0.tgz#abfb3d999084824d9a756d9b9c0f36fba03adb76"
-  integrity sha512-mccBLaBSpNVgp191CP5W+8U1crTyXsRziWliCqzj02kpxdjKMvFHGJbK33NroquH3zB/gZ8H511HEsJBa2fNEg==
+"@typescript-eslint/parser@^2.24.0", "@typescript-eslint/parser@^2.28.0":
+  version "2.29.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-2.29.0.tgz#6e3c4e21ed6393dc05b9d8b47f0b7e731ef21c9c"
+  integrity sha512-H78M+jcu5Tf6m/5N8iiFblUUv+HJDguMSdFfzwa6vSg9lKR8Mk9BsgeSjO8l2EshKnJKcbv0e8IDDOvSNjl0EA==
   dependencies:
     "@types/eslint-visitor-keys" "^1.0.0"
-    "@typescript-eslint/experimental-utils" "2.25.0"
-    "@typescript-eslint/typescript-estree" "2.25.0"
+    "@typescript-eslint/experimental-utils" "2.29.0"
+    "@typescript-eslint/typescript-estree" "2.29.0"
     eslint-visitor-keys "^1.1.0"
 
-"@typescript-eslint/typescript-estree@2.25.0":
-  version "2.25.0"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-2.25.0.tgz#b790497556734b7476fa7dd3fa539955a5c79e2c"
-  integrity sha512-VUksmx5lDxSi6GfmwSK7SSoIKSw9anukWWNitQPqt58LuYrKalzsgeuignbqnB+rK/xxGlSsCy8lYnwFfB6YJg==
+"@typescript-eslint/typescript-estree@2.29.0":
+  version "2.29.0"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/typescript-estree/-/typescript-estree-2.29.0.tgz#1be6612bb02fc37ac9f466521c1459a4744e8d3a"
+  integrity sha512-3YGbtnWy4az16Egy5Fj5CckkVlpIh0MADtAQza+jiMADRSKkjdpzZp/5WuvwK/Qib3Z0HtzrDFeWanS99dNhnA==
   dependencies:
     debug "^4.1.1"
     eslint-visitor-keys "^1.1.0"
@@ -3674,10 +3689,10 @@ eslint-config-airbnb-base@^14.1.0:
     object.assign "^4.1.0"
     object.entries "^1.1.1"
 
-eslint-config-airbnb-typescript@^7.2.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-typescript/-/eslint-config-airbnb-typescript-7.2.0.tgz#afa7cea5657c9f70c0b96d52bf7d470e9827b66a"
-  integrity sha512-W7IZUIJpBZIzU3p65KoyJPl2vGSy6FS3R+K91Cp3NLK/0m1oyvCFeBHI2QlWdqxkJ4FvwnLvsoRTutwpKNIT+A==
+eslint-config-airbnb-typescript@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-typescript/-/eslint-config-airbnb-typescript-7.2.1.tgz#bce3f02fa894d1ec2f31ac527992e03761a9b7d4"
+  integrity sha512-D3elVKUbdsCfkOVstSyWuiu+KGCVTrYxJPoenPIqZtL6Li/R4xBeVTXjZIui8B8D17bDN3Pz5dSr7jRLY5HqIg==
   dependencies:
     "@typescript-eslint/parser" "^2.24.0"
     eslint-config-airbnb "^18.1.0"
@@ -3803,6 +3818,11 @@ eslint-plugin-react-hooks@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-2.5.1.tgz#4ef5930592588ce171abeb26f400c7fbcbc23cd0"
   integrity sha512-Y2c4b55R+6ZzwtTppKwSmK/Kar8AdLiC2f9NADCuxbcTgPPg41Gyqa6b9GppgXSvCtkRw43ZE86CT5sejKC6/g==
+
+eslint-plugin-react-hooks@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-3.0.0.tgz#9e80c71846eb68dd29c3b21d832728aa66e5bd35"
+  integrity sha512-EjxTHxjLKIBWFgDJdhKKzLh5q+vjTFrqNZX36uIxWS4OfyXe5DawqPj3U5qeJ1ngLwatjzQnmR0Lz0J0YH3kxw==
 
 eslint-plugin-react@^7.19.0:
   version "7.19.0"
