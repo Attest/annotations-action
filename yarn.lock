@@ -75,25 +75,25 @@
   dependencies:
     prettier "^2.0.3"
 
-"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.8":
-  version "1.0.8"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.8/c1f37a8ca4f86bcbc5f111ffd2d7afe6aa5cfa3b6b54f36fd1ae3bb03b3cdfdf#cf14328695af8954c7f96f2e45af7d537598831c"
-  integrity sha512-UACDmujpuMEepHE7o6jddCMjaU3xOvFiw6QH+A0HyagHGJsxQ0qb7y8UeO6u2+GX8ylQV2X25KzSE21fR9pr+Q==
+"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.11":
+  version "1.0.11"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.11/7dda634d25a6f84778ffb53352f893b6c8c284405ffac9ba5d469120271a6ba7#f349bae911a0390a33d25f5336d0b0d990eb39e9"
+  integrity sha512-IpM3smqB6I++2OIkcvFZ4y0HS9Bm+f792QW+wGmpjWS3QmypD6p1ZLlcRK7tTWiMV3HQdcSZTAVf4z2BUYpcDQ==
   dependencies:
-    "@attest/config-rollup" "^2.0.7"
+    "@attest/config-rollup" "^2.0.10"
     "@zerollup/ts-transform-paths" "^1.7.17"
     rollup "^2.6.1"
     rollup-plugin-typescript2 "^0.27.0"
     typescript "3.8.3"
 
-"@attest/config-rollup@^2.0.7":
-  version "2.0.7"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/2.0.7/e282eb6b62f92c374d2009133547b244a2f586c3b17306b529b6982452500d51#2c3a016c416017bbc20b3d1b820177a79e568938"
-  integrity sha512-xV6DpZqno72kQx86rB/gpMSrR7nSeTc3d/ZodvZ2BzjNFqSapbbe1MXebB8UgLlRM3Ybc/NtkAiko0tiEjztMg==
+"@attest/config-rollup@^2.0.10":
+  version "2.0.10"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/2.0.10/ea7e9b208d01e8434f0ef32257e938465d6868dbe1b5a3666bc3690c5e619c50#171b43a2efa98bcd73afeb6600727e5fd4e93dd5"
+  integrity sha512-KZ2oiQWQT7tvMwTA85zrxSa7FGKsu04zDN9NMVTh7kR5gCMEby8bmpB0ulL21ZtdoJ9hE8BnB7bgRkgJaO6iyQ==
   dependencies:
     "@babel/core" "^7.9.0"
     "@rollup/plugin-commonjs" "^11.1.0"
-    "@rollup/plugin-json" "^4.0.2"
+    "@rollup/plugin-json" "^4.0.3"
     "@rollup/plugin-node-resolve" "^7.1.3"
     rollup "^2.6.1"
     rollup-plugin-babel "^4.4.0"
@@ -1528,12 +1528,12 @@
     magic-string "^0.25.2"
     resolve "^1.11.0"
 
-"@rollup/plugin-json@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@rollup/plugin-json/-/plugin-json-4.0.2.tgz#482185ee36ac7dd21c346e2dbcc22ffed0c6f2d6"
-  integrity sha512-t4zJMc98BdH42mBuzjhQA7dKh0t4vMJlUka6Fz0c+iO5IVnWaEMiYBy1uBj9ruHZzXBW23IPDGL9oCzBkQ9Udg==
+"@rollup/plugin-json@^4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-json/-/plugin-json-4.0.3.tgz#747e2c2884c5a0fa00b66c9c0f3f1012cddca534"
+  integrity sha512-QMUT0HZNf4CX17LMdwaslzlYHUKTYGuuk34yYIgZrNdu+pMEfqMS55gck7HEeHBKXHM4cz5Dg1OVwythDdbbuQ==
   dependencies:
-    "@rollup/pluginutils" "^3.0.4"
+    "@rollup/pluginutils" "^3.0.8"
 
 "@rollup/plugin-node-resolve@^7.1.3":
   version "7.1.3"
@@ -1546,7 +1546,7 @@
     is-module "^1.0.0"
     resolve "^1.14.2"
 
-"@rollup/pluginutils@^3.0.4", "@rollup/pluginutils@^3.0.8":
+"@rollup/pluginutils@^3.0.8":
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-3.0.8.tgz#4e94d128d94b90699e517ef045422960d18c8fde"
   integrity sha512-rYGeAc4sxcZ+kPG/Tw4/fwJODC3IXHYDH4qusdN/b6aLw5LPUbzpecYbEJh4sVQGPFJxd2dBU4kc1H3oy9/bnw==
