@@ -139,10 +139,26 @@
     eslint-plugin-react "^7.19.0"
     eslint-plugin-react-hooks "^2.5.1"
 
-"@attest/eslint-config@^0.2.8", "@attest/eslint-config@^0.2.9":
+"@attest/eslint-config@^0.2.9":
   version "0.2.9"
   resolved "https://npm.pkg.github.com/download/@attest/eslint-config/0.2.9/2e94c5edcc0afe2dc6eafde71a768b448883e04e4ba895f79bd627a1a62c7da9#19c12e4a9434af9dc65d88855a9799789612cb21"
   integrity sha512-1TSktFKZXsxNxgbzHD5Jeq965N/H0t6y7gsC2NlhSXjrX0ypqBmLd8swlD4F9tjt0ZMlwm7bYsDSZvlX8nI5jQ==
+  dependencies:
+    eslint "^6.7.2"
+    eslint-config-airbnb-base "^14.1.0"
+    eslint-config-prettier "^6.10.1"
+    eslint-plugin-import "^2.20.2"
+    eslint-plugin-json "^2.1.1"
+    eslint-plugin-markdown "^1.0.2"
+    eslint-plugin-package-json "^0.1.4"
+    eslint-plugin-promise "^4.2.1"
+    eslint-plugin-sort-imports-es6-autofix "^0.5.0"
+    eslint-plugin-unicorn "^18.0.1"
+
+"@attest/eslint-config@^1.0.0":
+  version "1.0.0"
+  resolved "https://npm.pkg.github.com/download/@attest/eslint-config/1.0.0/f05b820f7e02b7be49800b400077d636cabd5f280f73f017d8d56055b89f46df#60d8652f48cbd96c5f773d48fc5001715cbad7d4"
+  integrity sha512-W0wP6A4plhEuk+CjV5p49H10NnKLYxgmUO/5D1/Nsn+gF0R/+A4evWG2o6OTKJ3YAL+ZkInPfGHj7uxpVFRafQ==
   dependencies:
     eslint "^6.7.2"
     eslint-config-airbnb-base "^14.1.0"
