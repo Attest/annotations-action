@@ -75,27 +75,27 @@
   dependencies:
     prettier "^2.0.3"
 
-"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.11":
-  version "1.0.11"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.11/7dda634d25a6f84778ffb53352f893b6c8c284405ffac9ba5d469120271a6ba7#f349bae911a0390a33d25f5336d0b0d990eb39e9"
-  integrity sha512-IpM3smqB6I++2OIkcvFZ4y0HS9Bm+f792QW+wGmpjWS3QmypD6p1ZLlcRK7tTWiMV3HQdcSZTAVf4z2BUYpcDQ==
+"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.13":
+  version "1.0.13"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.13/d83bba9a48bc6935d78dc3b7d4d598eeea3fed54b05c88037330e0ac9328cf1d#556bc121f3e8677631aa501f86585be794287c39"
+  integrity sha512-VE5EkVW/CY0XwZFmHoRV5DYVi2ettLRDlTEfoA8e8sMXWkjYoSt/T/q5OBZT9BJcpH3PkQLR7va/KpD58iv1BQ==
   dependencies:
-    "@attest/config-rollup" "^2.0.10"
+    "@attest/config-rollup" "^2.0.12"
     "@zerollup/ts-transform-paths" "^1.7.17"
-    rollup "^2.6.1"
+    rollup "^2.7.2"
     rollup-plugin-typescript2 "^0.27.0"
     typescript "3.8.3"
 
-"@attest/config-rollup@^2.0.10":
-  version "2.0.10"
-  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/2.0.10/ea7e9b208d01e8434f0ef32257e938465d6868dbe1b5a3666bc3690c5e619c50#171b43a2efa98bcd73afeb6600727e5fd4e93dd5"
-  integrity sha512-KZ2oiQWQT7tvMwTA85zrxSa7FGKsu04zDN9NMVTh7kR5gCMEby8bmpB0ulL21ZtdoJ9hE8BnB7bgRkgJaO6iyQ==
+"@attest/config-rollup@^2.0.12":
+  version "2.0.12"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup/2.0.12/7d27d3824e2bb5fc4f822bbf00de7dfa60c42298da9d564ef0f8ff90522ae2e1#a04f7ae798f05e1488d1c0f14a0815388f62a09d"
+  integrity sha512-ifu9Ut0N7BOs3i0yHKZ7UZgAEQZAfeH92QcqZXmAcru2AejWTFp3IyzBhbPAxhqJe1hTKyJ0ORaDzAY79Sm4vA==
   dependencies:
     "@babel/core" "^7.9.0"
     "@rollup/plugin-commonjs" "^11.1.0"
     "@rollup/plugin-json" "^4.0.3"
     "@rollup/plugin-node-resolve" "^7.1.3"
-    rollup "^2.6.1"
+    rollup "^2.7.2"
     rollup-plugin-babel "^4.4.0"
     rollup-plugin-multi-input "^1.1.1"
 
@@ -8752,10 +8752,10 @@ rollup-pluginutils@^2.8.1:
   dependencies:
     estree-walker "^0.6.1"
 
-rollup@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.6.1.tgz#8354e67caa7b8bf24c2488d9e2f64da2be62eebe"
-  integrity sha512-1RhFDRJeg027YjBO6+JxmVWkEZY0ASztHhoEUEWxOwkh4mjO58TFD6Uo7T7Y3FbmDpRTfKhM5NVxJyimCn0Elg==
+rollup@^2.7.2:
+  version "2.7.6"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.7.6.tgz#8e6682e64ca65eb33b896dcce902696f0415ce1a"
+  integrity sha512-AdHosxHBKyBsdtbT1/AqbWNQ87O4SSxS4N9iMwEpoCDAT6e4Du3uJSy83mp3ckgmCxly5VeXGx0WHsm21Djytg==
   optionalDependencies:
     fsevents "~2.1.2"
 
