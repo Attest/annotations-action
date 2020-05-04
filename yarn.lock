@@ -106,10 +106,10 @@
   dependencies:
     typescript "3.8.3"
 
-"@attest/conventional-changelog@^1.0.19":
-  version "1.0.19"
-  resolved "https://npm.pkg.github.com/download/@attest/conventional-changelog/1.0.19/f8aa0c77226d93e56be46b78bfa4451b3c446cb6b453b93cbae56a3a44a7d6bb#c915f6dc350cc3cf3454dcf3734e8fbc01d89344"
-  integrity sha512-+qQLSSX/hPzJZ8/J50K8b8eEyqieKf4fhAbfh+Fw55Y7PGLWnbN4NWyVPba2/nJ3saxD/khWA8ts2tM12PNkwg==
+"@attest/conventional-changelog@^1.0.21":
+  version "1.0.21"
+  resolved "https://npm.pkg.github.com/download/@attest/conventional-changelog/1.0.21/510de2b783dd57a9b7282df8686ef72de6df977584b1747ea04a55c8a011bbaf#8f91feea0d9b222d60bce5c9f101953eb42c5bdf"
+  integrity sha512-CSSARI28kebnbCCnkODJn43vcFQ02FqYBIK7/Rh/rpYnr8G++wdSgA97+i+uy0OkMHR27z9qVmQp1Se1RXPm+w==
   dependencies:
     compare-func "^1.3.2"
     conventional-changelog-core "^4.1.4"
