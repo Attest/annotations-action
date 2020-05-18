@@ -65,7 +65,7 @@
     "@attest/eslint-config-node": "^0.1.0",
     "@attest/eslint-config-typescript": "^0.1.21",
     "@attest/generate-codeowners": "^0.1.22",
-    "@attest/standard-commits": "^0.1.51",
+    "@attest/standard-commits": "^0.1.67",
     "@babel/core": "^7.9.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/commit-analyzer": "^8.0.1",
