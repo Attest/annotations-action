@@ -99,12 +99,12 @@
     rollup-plugin-babel "^4.4.0"
     rollup-plugin-multi-input "^1.1.1"
 
-"@attest/config-typescript@^1.0.6":
-  version "1.0.6"
-  resolved "https://npm.pkg.github.com/download/@attest/config-typescript/1.0.6/abf6bf8b11aae2e800d223b9fe8e812cc41455391acff0fa995877a8bebf0ea4#a60096dbd49a9ccbb292c2685edc4906f360377b"
-  integrity sha512-7uQrAFdVA0Ti01fYWToB7IGowZ34BRx3JMYYFy8eTh6V4N76deYiD7ZwwTbgyQk7kBMoV5/XMrO0GUgkLwzamg==
+"@attest/config-typescript@^1.0.7":
+  version "1.0.7"
+  resolved "https://npm.pkg.github.com/download/@attest/config-typescript/1.0.7/4ce0739ed71052339a538290bcb7f85d6f9b8973b4e7baf8092c99cae065ec59#dd75ba98594a768e69e27322b253ff23087c0b65"
+  integrity sha512-wrDKrSfqW88WbAFGtpolpaTmpbY5Vi6wHhbippVawSmaKdp701LgUqyCWpNLDWDMr+xrsPjr6o2D1iAhFiK00Q==
   dependencies:
-    typescript "3.8.3"
+    typescript "3.9.5"
 
 "@attest/conventional-changelog@^1.0.19":
   version "1.0.19"
@@ -9857,10 +9857,15 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@3.8.3, typescript@^3.8.3:
+typescript@3.8.3:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.8.3.tgz#409eb8544ea0335711205869ec458ab109ee1061"
   integrity sha512-MYlEfn5VrLNsgudQTVJeNaQFUAI7DkhnOjdpAp4T+ku1TfQClewlbSuTVHiA+8skNBgaf02TL/kLOvig4y3G8w==
+
+typescript@3.9.5, typescript@^3.8.3:
+  version "3.9.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.5.tgz#586f0dba300cde8be52dd1ac4f7e1009c1b13f36"
+  integrity sha512-hSAifV3k+i6lEoCJ2k6R2Z/rp/H3+8sdmcn5NrS3/3kE7+RyZXm9aqvxWqjEXHAd8b0pShatpcdMTvEdvAJltQ==
 
 uglify-js@^3.1.4:
   version "3.8.1"
