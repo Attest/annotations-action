@@ -62,7 +62,7 @@
     "@attest/config-typescript": "^1.0.6",
     "@attest/conventional-changelog": "^1.0.19",
     "@attest/eslint-config": "^0.2.8",
-    "@attest/eslint-config-node": "^0.1.0",
+    "@attest/eslint-config-node": "^0.1.4",
     "@attest/eslint-config-typescript": "^0.1.21",
     "@attest/generate-codeowners": "^0.1.22",
     "@attest/standard-commits": "^0.1.51",
