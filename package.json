@@ -52,7 +52,7 @@
     "@octokit/rest": "^16.43.1"
   },
   "devDependencies": {
-    "@attest/babel-preset-env-node": "^1.0.3",
+    "@attest/babel-preset-env-node": "^1.0.6",
     "@attest/babel-preset-jest": "^1.0.3",
     "@attest/babel-preset-typescript": "^2.0.1",
     "@attest/config-jest": "^0.3.36",
