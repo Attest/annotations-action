@@ -99,12 +99,10 @@
     rollup-plugin-babel "^4.4.0"
     rollup-plugin-multi-input "^1.1.1"
 
-"@attest/config-typescript@^1.0.6":
-  version "1.0.6"
-  resolved "https://npm.pkg.github.com/download/@attest/config-typescript/1.0.6/abf6bf8b11aae2e800d223b9fe8e812cc41455391acff0fa995877a8bebf0ea4#a60096dbd49a9ccbb292c2685edc4906f360377b"
-  integrity sha512-7uQrAFdVA0Ti01fYWToB7IGowZ34BRx3JMYYFy8eTh6V4N76deYiD7ZwwTbgyQk7kBMoV5/XMrO0GUgkLwzamg==
-  dependencies:
-    typescript "3.8.3"
+"@attest/config-typescript@^2.0.0":
+  version "2.0.0"
+  resolved "https://npm.pkg.github.com/download/@attest/config-typescript/2.0.0/25a11def3bf2bba553d9a79c989e15acf535e5790a5b022728556dcf471240cb#7bb1e6f64820b7f36f254ce41375590ba7bc7526"
+  integrity sha512-yhr0XRS5sPhiV0FoxqV6EoAxd1jmQQm9frLUjeO9RpJSRsAHkV5GVncpSn/NsK1YxPyyIq0/7ax8RME9RYSFog==
 
 "@attest/conventional-changelog@^1.0.19":
   version "1.0.19"
