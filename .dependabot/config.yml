@@ -3,11 +3,11 @@ update_configs:
   - package_manager: 'javascript'
     directory: '/'
     update_schedule: 'weekly'
-    version_requirement_updates: increase_versions
+    version_requirement_updates: increase_versions_if_necessary
     automerged_updates:
       - match:
           dependency_type: 'all'
-          update_type: 'semver:patch'
+          update_type: 'in_range'
     default_labels:
       - '🤖 Dependency update'
     commit_message:
