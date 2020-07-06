@@ -56,7 +56,7 @@
     "@attest/babel-preset-jest": "^1.0.3",
     "@attest/babel-preset-typescript": "^2.0.1",
     "@attest/config-jest": "^0.3.36",
-    "@attest/config-npm-package-json-lint": "^0.2.7",
+    "@attest/config-npm-package-json-lint": "^0.3.0",
     "@attest/config-prettier": "^0.3.4",
     "@attest/config-rollup-typescript": "^1.0.11",
     "@attest/config-typescript": "^1.0.6",
