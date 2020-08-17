@@ -75,7 +75,7 @@
   dependencies:
     prettier "^2.0.4"
 
-"@attest/config-rollup-typescript@^1.0.1", "@attest/config-rollup-typescript@^1.0.11":
+"@attest/config-rollup-typescript@^1.0.11":
   version "1.0.11"
   resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/1.0.11/7dda634d25a6f84778ffb53352f893b6c8c284405ffac9ba5d469120271a6ba7#f349bae911a0390a33d25f5336d0b0d990eb39e9"
   integrity sha512-IpM3smqB6I++2OIkcvFZ4y0HS9Bm+f792QW+wGmpjWS3QmypD6p1ZLlcRK7tTWiMV3HQdcSZTAVf4z2BUYpcDQ==
@@ -85,6 +85,14 @@
     rollup "^2.6.1"
     rollup-plugin-typescript2 "^0.27.0"
     typescript "3.8.3"
+
+"@attest/config-rollup-typescript@^2.1.0":
+  version "2.1.0"
+  resolved "https://npm.pkg.github.com/download/@attest/config-rollup-typescript/2.1.0/9b57e08d6e156df87fe5b885aaf429df176ab07f83a3b569b39ab0547ef6af91#021d27652a49f1f1e8aea0580b5fc53e3fe85e51"
+  integrity sha512-jj3dO8rcS4TQpO/IwoJSOBUx3neDkL9Yb6q8wkTqqhnWRo2/lOQt+fb4HLC6JeoY+7GL86t5QbvJOs/Av6AK3g==
+  dependencies:
+    "@zerollup/ts-transform-paths" "^1.7.18"
+    ts-transformer-keys "^0.4.2"
 
 "@attest/config-rollup@^2.0.10":
   version "2.0.10"
@@ -156,12 +164,12 @@
     eslint-plugin-unicorn "^18.0.1"
 
 "@attest/generate-codeowners@^0.1.22":
-  version "0.1.23"
-  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.23/61388184895f08779f5212715019e6e67251e1426eb44d30af30985bc3f4c7e9#6c9e8410505cd7c5e9369409a1bf1bda2a7f0112"
-  integrity sha512-ke6Qurws3XEMVny0hOtorc46iKBx+7N0woHtrOpycUZGplrB7XA2E9Pg2zRQN/VxP98y8DtMjSutJc3iwx8nVw==
+  version "0.1.63"
+  resolved "https://npm.pkg.github.com/download/@attest/generate-codeowners/0.1.63/364511c38aff78ac52ccafa3c6699c37c79c8ec2f9b8849bb7cbfb677bc8c0cd#53306a534a8917d390c658ed3240b3eb4d6534ac"
+  integrity sha512-m72LnovKAb422tfO0jzG9TpYjNTjTPv0bYSK4ePBGwrH3aFCSpQX5FwVK1N3gBajx5ig8OhARcvUVchrDitjqg==
   dependencies:
-    "@attest/config-rollup-typescript" "^1.0.1"
-    glob "^7.1.6"
+    "@attest/config-rollup-typescript" "^2.1.0"
+    fast-glob "^3.2.2"
     title-case "^3.0.2"
 
 "@attest/standard-commits@^0.1.51":
@@ -1867,12 +1875,26 @@
   dependencies:
     resolve "^1.12.0"
 
+"@zerollup/ts-helpers@^1.7.18":
+  version "1.7.18"
+  resolved "https://registry.yarnpkg.com/@zerollup/ts-helpers/-/ts-helpers-1.7.18.tgz#747177f6d5abc06c3a0f5dffe7362d365cf0391d"
+  integrity sha512-S9zN+y+i5yN/evfWquzSO3lubqPXIsPQf6p9OiPMpRxDx/0totPLF39XoRw48Dav5dSvbIE8D2eAPpXXJxvKwg==
+  dependencies:
+    resolve "^1.12.0"
+
 "@zerollup/ts-transform-paths@^1.7.17":
   version "1.7.17"
   resolved "https://registry.yarnpkg.com/@zerollup/ts-transform-paths/-/ts-transform-paths-1.7.17.tgz#b9bfab9ad6a7c2e09f40930345f18c9435cda51f"
   integrity sha512-sdf8v1s6/QllFjsidj1qcbHWjWexrQHMcX3fPByKlUAz4IPYK+tb/lag7peplDvyTi1GlwjKXWOQfBDZNhiyRg==
   dependencies:
     "@zerollup/ts-helpers" "^1.7.16"
+
+"@zerollup/ts-transform-paths@^1.7.18":
+  version "1.7.18"
+  resolved "https://registry.yarnpkg.com/@zerollup/ts-transform-paths/-/ts-transform-paths-1.7.18.tgz#72f705c66690879e51d53c73dc76c4e2518a8c50"
+  integrity sha512-YPVUxvWQVzRx1OBN0Pmkd58+R9FcfUJuwTaPUSoi5rKxuXMtxevTXdfi0w5mEaIH8b0DfL+wg0wFDHiJE+S2zA==
+  dependencies:
+    "@zerollup/ts-helpers" "^1.7.18"
 
 JSONStream@^1.0.4, JSONStream@^1.3.4, JSONStream@^1.3.5:
   version "1.3.5"
@@ -4135,10 +4157,10 @@ fast-deep-equal@^3.1.1:
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-3.1.1.tgz#545145077c501491e33b15ec408c294376e94ae4"
   integrity sha512-8UEa58QDLauDNfpbrX55Q9jrGHThw2ZMdOky5Gl1CDtVeJDPVrG4Jxx1N8jw2gkWaff5UUuX1KJd+9zGe2B+ZA==
 
-fast-glob@^3.0.0, fast-glob@^3.0.3, fast-glob@^3.1.1:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.2.tgz#ade1a9d91148965d4bf7c51f72e1ca662d32e63d"
-  integrity sha512-UDV82o4uQyljznxwMxyVRJgZZt3O5wENYojjzbaGEGZgeOxkLFf+V4cnUD+krzb2F72E18RhamkMZ7AdeggF7A==
+fast-glob@^3.0.0, fast-glob@^3.0.3, fast-glob@^3.1.1, fast-glob@^3.2.2:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.4.tgz#d20aefbf99579383e7f3cc66529158c9b98554d3"
+  integrity sha512-kr/Oo6PX51265qeuCYsyGypiO5uJFgBS0jksyG7FUeCyQzNwYnzrNIMR1NXfkZXsMYXYLRAHgISHBz8gQcxKHQ==
   dependencies:
     "@nodelib/fs.stat" "^2.0.2"
     "@nodelib/fs.walk" "^1.2.3"
@@ -9783,6 +9805,11 @@ trough@^1.0.0:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/trough/-/trough-1.0.5.tgz#b8b639cefad7d0bb2abd37d433ff8293efa5f406"
   integrity sha512-rvuRbTarPXmMb79SmzEp8aqXNKcK+y0XaB298IXueQ8I2PsrATcPBCSPyK/dDNa2iWOhKlfNnOjdAOTBU/nkFA==
+
+ts-transformer-keys@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/ts-transformer-keys/-/ts-transformer-keys-0.4.2.tgz#130d5b116b14d537d26aff2894dca10ac1877b22"
+  integrity sha512-8WVoathKnPIeZbhKuqkBKdWLq1JuiZjT5EmaKobeMI5AHQZIVLI8vyU+1h7e1YiIEIvtBUbmZ12uj2cFbgj5qg==
 
 tslib@1.11.1, tslib@^1.10.0, tslib@^1.8.1, tslib@^1.9.0:
   version "1.11.1"
